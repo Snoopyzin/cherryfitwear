@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Painel | Cherry Fitwear</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#7a0a2a">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600;1,700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/admin.css">
+  <script>
+    // Se algo falhar ao carregar (navegador antigo, internet ruim…), mostra um aviso em vez de deixar a tela parada.
+    (function () {
+      var mostrou = false;
+      function aviso(msg) {
+        if (mostrou) return;
+        mostrou = true;
+        var d = document.createElement('div');
+        d.setAttribute('role', 'alert');
+        d.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;padding:14px 16px;border-radius:14px;background:#4a0a16;color:#fff;font:600 14px/1.4 system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.4)';
+        d.textContent = msg;
+        (document.body || document.documentElement).appendChild(d);
+      }
+      window.addEventListener('error', function (e) {
+        var onde = e.filename ? ' (' + String(e.filename).split('/').pop() + ':' + e.lineno + ')' : '';
+        aviso('Não consegui abrir o painel direito neste aparelho. Atualize a página. Se continuar, mande esta mensagem para o Gabriel: ' + (e.message || 'erro') + onde);
+      });
+      setTimeout(function () {
+        if (!window.CherryAdminCarregou) aviso('O painel está demorando para carregar. Se a tela continuar parada, atualize a página.');
+      }, 15000);
+    })();
+  </script>
+</head>
+<body>
+
+  <header class="topo">
+    <div class="topo__marca">
+      <img src="images/cereja-laco.webp" alt="" width="38" height="50">
+      <div>
+        <p class="topo__titulo">Painel da loja</p>
+        <p class="topo__sub">Cherry Fitwear</p>
+      </div>
+    </div>
+    <div class="topo__acoes">
+      <a class="btn btn--sec btn--peq" href="index.html" target="_blank" rel="noopener">Ver o site</a>
+      <button class="btn btn--prim btn--peq" id="btn-publicar" type="button">Publicar<span class="selo-conta" id="topo-contagem" hidden>0</span></button>
+    </div>
+  </header>
+
+  <main class="miolo" id="miolo">
+    <noscript><p class="aviso aviso--erro">Ative o JavaScript do navegador para usar o painel.</p></noscript>
+
+    <div id="avisos"></div>
+
+    <div class="abas" role="tablist" aria-label="Seções do painel">
+      <button class="aba" type="button" role="tab" id="tab-produtos" aria-controls="aba-produtos" aria-selected="true" data-aba="produtos">Produtos</button>
+      <button class="aba" type="button" role="tab" id="tab-vitrine" aria-controls="aba-vitrine" aria-selected="false" data-aba="vitrine" tabindex="-1">Vitrine</button>
+      <button class="aba" type="button" role="tab" id="tab-marcas" aria-controls="aba-marcas" aria-selected="false" data-aba="marcas" tabindex="-1">Coleções</button>
+      <button class="aba" type="button" role="tab" id="tab-config" aria-controls="aba-config" aria-selected="false" data-aba="config" tabindex="-1">Contato</button>
+    </div>
+
+    <!-- ========== PRODUTOS ========== -->
+    <section id="aba-produtos" role="tabpanel" aria-labelledby="tab-produtos">
+      <div class="ferramentas">
+        <label class="busca">
+          <span class="sr-only">Buscar produto</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg>
+          <input id="f-busca" type="search" placeholder="Buscar peça ou coleção…" autocomplete="off">
+        </label>
+        <label class="seletor">
+          <span class="sr-only">Filtrar por coleção</span>
+          <select id="f-marca"></select>
+        </label>
+        <label class="seletor">
+          <span class="sr-only">Mostrar</span>
+          <select id="f-mostrar">
+            <option value="">Mostrar: todos</option>
+            <option value="promo">Só as promoções</option>
+            <option value="sem-preco">Só os sem preço</option>
+            <option value="mudou">Só os alterados</option>
+          </select>
+        </label>
+        <div class="chips" role="group" aria-label="Categoria">
+          <button class="chip" type="button" data-cat="todos" aria-pressed="true">Todos</button>
+          <button class="chip" type="button" data-cat="leggings" aria-pressed="false">Leggings e calças</button>
+          <button class="chip" type="button" data-cat="tops" aria-pressed="false">Tops</button>
+          <button class="chip" type="button" data-cat="shorts" aria-pressed="false">Shorts</button>
+          <button class="chip" type="button" data-cat="conjuntos" aria-pressed="false">Conjuntos</button>
+          <button class="chip" type="button" data-cat="jaquetas" aria-pressed="false">Jaquetas</button>
+        </div>
+        <button class="btn btn--prim" id="btn-novo-produto" type="button">+ Novo produto</button>
+      </div>
+      <p class="dica">Mude os preços direto na lista, é só digitar. Para trocar foto, nome ou descrição, toque em <strong>Editar tudo</strong>. Para colocar um produto em <strong>promoção</strong>, toque em <strong>+ Promoção</strong> na linha dele (ou use a aba <strong>Vitrine</strong>): ele vai para a seção de promoções no topo do site. Nada vai para o site até você tocar em <strong>Publicar</strong>.</p>
+      <p class="contagem" id="lista-contagem" aria-live="polite"></p>
+      <div class="lista" id="lista-produtos"><p class="carregando">Carregando o catálogo…</p></div>
+    </section>
+
+    <!-- ========== VITRINE ========== -->
+    <section id="aba-vitrine" role="tabpanel" aria-labelledby="tab-vitrine" hidden>
+      <div class="vitrine">
+        <p class="dica">Escolha aqui o que aparece na página inicial: as promoções (no topo), os lançamentos e as seções que você criar.</p>
+        <div class="cartao-form">
+          <h2 class="titulo-secao">Promoções!</h2>
+          <p class="dica">É aqui que você escolhe o que fica em promoção. Os produtos aparecem numa seção no topo da página inicial, logo abaixo da faixa rolante, com o preço antigo riscado e a porcentagem de desconto.</p>
+          <div class="par">
+            <div class="campo">
+              <label for="vt-promo-titulo">Nome da seção no site</label>
+              <input id="vt-promo-titulo" type="text" maxlength="40" autocomplete="off" placeholder="Promoções!">
+            </div>
+            <div class="campo">
+              <label for="vt-promo-sobre">Frase pequena em cima do nome</label>
+              <input id="vt-promo-sobre" type="text" maxlength="40" autocomplete="off" placeholder="Preços especiais">
+            </div>
+          </div>
+          <p class="campo__ajuda" id="vt-promo-nome-ajuda"></p>
+          <div class="vt-lista" id="vt-promo-lista"></div>
+          <div class="vt-add vt-add--promo">
+            <label class="sr-only" for="vt-promo-sel">Produto para colocar em promoção</label>
+            <select id="vt-promo-sel"></select>
+            <div class="campo-reais"><i>R$</i><input id="vt-promo-preco" type="text" inputmode="decimal" autocomplete="off" placeholder="preço ou 10%" aria-label="Preço promocional ou desconto em porcentagem"></div>
+            <button class="btn btn--prim btn--peq" type="button" data-acao="add-promo">Promover</button>
+          </div>
+          <p class="campo__ajuda" id="vt-promo-ajuda">Escolha o produto e digite o novo preço (ex.: 149,90) ou o desconto (ex.: 10%). O preço de hoje passa a aparecer riscado.</p>
+          <p class="aviso aviso--erro" id="vt-promo-erro" role="alert" hidden></p>
+        </div>
+
+        <div class="cartao-form">
+          <h2 class="titulo-secao">Lançamentos</h2>
+          <p class="dica">Ganham a etiqueta “Lançamento” na foto. Produtos em promoção mostram a porcentagem de desconto no lugar da etiqueta.</p>
+          <div class="vt-lista" id="vt-lanc-lista"></div>
+          <div class="vt-add">
+            <label class="sr-only" for="vt-lanc-sel">Produto para marcar como lançamento</label>
+            <select id="vt-lanc-sel"></select>
+            <button class="btn btn--prim btn--peq" type="button" data-acao="add-lanc">Marcar</button>
+          </div>
+        </div>
+
+        <div class="cartao-form">
+          <h2 class="titulo-secao">Suas próprias seções</h2>
+          <p class="dica">Além das Promoções e dos Lançamentos, crie as seções que quiser (por exemplo “Mais vendidos”, “Conjuntos”, “Para o treino pesado”) e escolha os produtos de cada uma. Elas aparecem na página inicial, logo abaixo das Promoções, na ordem em que estão aqui.</p>
+          <div id="vt-secoes"></div>
+          <div class="vt-add">
+            <label class="sr-only" for="vt-secao-nome">Nome da nova seção</label>
+            <input id="vt-secao-nome" type="text" maxlength="40" autocomplete="off" placeholder="Nome da nova seção (ex.: Mais vendidos)">
+            <button class="btn btn--prim btn--peq" type="button" data-acao="add-secao">Criar seção</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== COLEÇÕES ========== -->
+    <section id="aba-marcas" role="tabpanel" aria-labelledby="tab-marcas" hidden>
+      <div class="ferramentas ferramentas--marcas">
+        <p class="dica">As coleções aparecem na seção “Coleções” do site. Cadastre a coleção aqui antes de criar peças dela.</p>
+        <button class="btn btn--prim" id="btn-nova-marca" type="button">+ Nova coleção</button>
+      </div>
+      <div class="lista lista--marcas" id="lista-marcas"></div>
+    </section>
+
+    <!-- ========== REGRAS E CONTATO ========== -->
+    <section id="aba-config" role="tabpanel" aria-labelledby="tab-config" hidden>
+      <div class="cartao-form">
+        <h2 class="titulo-secao">Desconto no Instagram</h2>
+        <div class="campo">
+          <label for="cfg-desc-seguir">Desconto para quem seguir os perfis</label>
+          <div class="campo-sufixo"><input id="cfg-desc-seguir" type="number" inputmode="numeric" min="0" max="100" step="1"><span>%</span></div>
+          <p class="campo__ajuda">Aparece num aviso logo no começo da página inicial. Coloque <strong>0</strong> para esconder o aviso.</p>
+        </div>
+        <div class="campo">
+          <label for="cfg-perfis">Perfis que precisam ser seguidos</label>
+          <input id="cfg-perfis" type="text" autocomplete="off" spellcheck="false" placeholder="@seuperfil, @outroperfil">
+          <p class="campo__ajuda" id="cfg-perfis-ajuda"></p>
+        </div>
+
+        <h2 class="titulo-secao">WhatsApp</h2>
+        <div class="campo">
+          <label for="cfg-whats">Número que recebe os pedidos</label>
+          <input id="cfg-whats" type="tel" inputmode="tel" autocomplete="off" placeholder="(62) 99999-8888">
+          <p class="campo__ajuda" id="cfg-whats-ajuda"></p>
+        </div>
+        <div class="campo">
+          <label for="cfg-msg">Mensagem do botão “WhatsApp”</label>
+          <textarea id="cfg-msg" rows="3"></textarea>
+          <p class="campo__ajuda">É o texto que já vem escrito quando o cliente toca no botão do início do site.</p>
+        </div>
+      </div>
+
+      <details class="avancado">
+        <summary>Ferramentas avançadas</summary>
+        <div class="avancado__corpo">
+          <p>Para quem cuida do site: baixe os arquivos que o painel gera (útil se a conexão com o GitHub der problema) ou volte ao que está no ar.</p>
+          <div class="botoes">
+            <button class="btn btn--sec btn--peq" id="btn-baixar" type="button">Baixar arquivos do catálogo</button>
+            <button class="btn btn--sec btn--peq" id="btn-recarregar" type="button">Recarregar do site (descarta alterações)</button>
+            <button class="btn btn--sec btn--peq" id="btn-conexao" type="button">Conexão com o GitHub</button>
+          </div>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <!-- barra fixa quando há alterações -->
+  <div class="barra-publicar" id="barra-publicar" hidden>
+    <p id="barra-texto"></p>
+    <button class="btn btn--sec btn--peq" id="btn-descartar" type="button">Descartar</button>
+    <button class="btn btn--prim" id="btn-publicar-2" type="button">Publicar no site</button>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="fundo-dlg" id="fundo-dlg" hidden></div>
+
+  <!-- ========== EDITAR / CRIAR PRODUTO ========== -->
+  <dialog class="dlg" id="dlg-produto" aria-labelledby="dp-titulo">
+    <form id="form-produto" novalidate>
+      <header class="dlg__topo">
+        <h2 id="dp-titulo">Editar produto</h2>
+        <button class="fechar" type="button" data-fecha aria-label="Fechar">×</button>
+      </header>
+      <div class="dlg__corpo">
+        <div class="fotos-bloco">
+          <p class="rotulo">Fotos do produto <small>(a primeira é a principal)</small></p>
+          <ul class="fotos-lista" id="dp-fotos"></ul>
+          <div class="botoes">
+            <label class="btn btn--sec btn--peq btn-arquivo">+ Adicionar fotos<input id="dp-foto" type="file" accept="image/*" multiple></label>
+          </div>
+          <p class="campo__ajuda" id="dp-foto-info">Dá para escolher várias fotos de uma vez. Elas são ajustadas sozinhas (quadradas, fundo branco e leves). A primeira aparece no catálogo; as outras aparecem quando o cliente abre os detalhes do produto. Sem foto, o site mostra uma ilustração da peça.</p>
+        </div>
+
+        <div class="campo">
+          <label for="dp-nome">Nome da peça</label>
+          <input id="dp-nome" name="nome" type="text" required autocomplete="off" placeholder="Ex.: Calça Flare Signature Preta">
+        </div>
+        <div class="campo">
+          <label for="dp-tipo">O que é <small>(texto curto embaixo do nome)</small></label>
+          <input id="dp-tipo" name="tipo" type="text" autocomplete="off" placeholder="Ex.: Calça flare cintura alta · P ao GG">
+        </div>
+        <div class="par">
+          <div class="campo">
+            <label for="dp-marca">Coleção</label>
+            <select id="dp-marca" name="marca" required></select>
+          </div>
+          <div class="campo">
+            <label for="dp-categoria">Categoria</label>
+            <select id="dp-categoria" name="categoria">
+              <option value="leggings">Leggings e calças</option>
+              <option value="tops">Tops</option>
+              <option value="shorts">Shorts</option>
+              <option value="conjuntos">Conjuntos</option>
+              <option value="jaquetas">Jaquetas</option>
+            </select>
+          </div>
+        </div>
+
+        <h3 class="subtitulo">Preço</h3>
+        <div class="par">
+          <div class="campo">
+            <label for="dp-preco" id="dp-preco-rotulo">Preço</label>
+            <div class="campo-reais"><i>R$</i><input id="dp-preco" name="preco" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+          </div>
+        </div>
+        <div class="promo-caixa">
+          <label class="check" for="dp-promo"><input id="dp-promo" type="checkbox"> Colocar este produto em promoção</label>
+          <div class="campo" id="dp-promo-campos" hidden>
+            <label for="dp-antigo">Preço antigo <small>(o de antes; aparece riscado)</small></label>
+            <div class="campo-reais"><i>R$</i><input id="dp-antigo" name="precoAntigo" type="text" inputmode="decimal" autocomplete="off" placeholder="0"></div>
+            <p class="campo__ajuda">Digite o <strong>preço promocional</strong> no campo de cima (ou um desconto, como <strong>10%</strong>). Para tirar da promoção, desmarque a caixa: o produto volta ao preço antigo.</p>
+          </div>
+        </div>
+        <p class="campo__ajuda">Deixe o <strong>preço</strong> vazio para mostrar “Preço em breve”.</p>
+
+        <div class="campo">
+          <label for="dp-selo">Etiqueta na foto <small>(opcional)</small></label>
+          <input id="dp-selo" name="selo" type="text" autocomplete="off" maxlength="20" placeholder="Ex.: Lançamento">
+          <p class="campo__ajuda">Em produtos em promoção, o site mostra a porcentagem de desconto no lugar da etiqueta.</p>
+        </div>
+
+        <details class="recolhe" id="dp-desc-det">
+          <summary>Descrição completa <small>(aparece em “Ver detalhes”)</small></summary>
+          <div class="recolhe__corpo">
+            <div class="campo">
+              <label for="dp-resumo">Resumo</label>
+              <textarea id="dp-resumo" rows="3"></textarea>
+            </div>
+            <div class="campo">
+              <label for="dp-serve">Para quais treinos?</label>
+              <textarea id="dp-serve" rows="3"></textarea>
+            </div>
+            <div class="campo">
+              <label for="dp-beneficios">Principais diferenciais <small>(um por linha)</small></label>
+              <textarea id="dp-beneficios" rows="5"></textarea>
+            </div>
+            <div class="campo">
+              <label for="dp-ativos">Tecido e acabamento <small>(um por linha, assim: Nome: explicação)</small></label>
+              <textarea id="dp-ativos" rows="4" placeholder="Poliamida com elastano: ótima elasticidade e retorno"></textarea>
+            </div>
+            <div class="campo">
+              <label for="dp-rotina">Como combinar <small>(separe os parágrafos com uma linha em branco)</small></label>
+              <textarea id="dp-rotina" rows="5"></textarea>
+            </div>
+            <div class="campo">
+              <label for="dp-importante">Aviso importante <small>(opcional)</small></label>
+              <textarea id="dp-importante" rows="2"></textarea>
+            </div>
+            <p class="campo__ajuda" id="dp-extra-info" hidden></p>
+          </div>
+        </details>
+
+        <details class="recolhe">
+          <summary>Ilustração quando não há foto <small>(opcional)</small></summary>
+          <div class="recolhe__corpo">
+            <div class="campo">
+              <label for="dp-forma">Formato da peça</label>
+              <select id="dp-forma"></select>
+            </div>
+            <div class="trio">
+              <div class="campo"><label for="dp-cor-corpo">Cor principal</label><input id="dp-cor-corpo" type="color"></div>
+              <div class="campo"><label for="dp-cor-tampa">Cor do cós e recortes</label><input id="dp-cor-tampa" type="color"></div>
+              <div class="campo"><label for="dp-cor-texto">Cor do monograma CF</label><input id="dp-cor-texto" type="color"></div>
+            </div>
+          </div>
+        </details>
+
+        <p class="aviso aviso--erro" id="dp-erro" role="alert" hidden></p>
+      </div>
+      <footer class="dlg__rodape">
+        <button class="btn btn--perigo btn--peq" id="dp-excluir" type="button">Excluir produto</button>
+        <span class="espaco"></span>
+        <button class="btn btn--sec" type="button" data-fecha>Cancelar</button>
+        <button class="btn btn--prim" type="submit">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ========== COLEÇÃO ========== -->
+  <dialog class="dlg dlg--peq" id="dlg-marca" aria-labelledby="dm-titulo">
+    <form id="form-marca" novalidate>
+      <header class="dlg__topo">
+        <h2 id="dm-titulo">Nova coleção</h2>
+        <button class="fechar" type="button" data-fecha aria-label="Fechar">×</button>
+      </header>
+      <div class="dlg__corpo">
+        <div class="logo-previa"><span id="dm-previa" class="logo logo--sans">Coleção</span></div>
+        <div class="campo">
+          <label for="dm-nome">Nome da coleção</label>
+          <input id="dm-nome" type="text" required autocomplete="off" placeholder="Ex.: Signature">
+        </div>
+        <div class="campo">
+          <label for="dm-logo">Como o nome aparece no “logo” <small>(deixe vazio para usar o nome)</small></label>
+          <input id="dm-logo" type="text" autocomplete="off">
+        </div>
+        <div class="campo">
+          <label for="dm-estilo">Estilo da letra</label>
+          <select id="dm-estilo"></select>
+        </div>
+        <div class="par">
+          <div class="campo"><label for="dm-cor">Cor da letra</label><input id="dm-cor" type="color" value="#111111"></div>
+          <div class="campo">
+            <label for="dm-fundo-usar" class="check"><input id="dm-fundo-usar" type="checkbox"> Fundo colorido</label>
+            <input id="dm-fundo" type="color" value="#8b52c4" disabled>
+          </div>
+        </div>
+        <div class="campo">
+          <label for="dm-sub">Subtítulo <small>(opcional, aparece embaixo do nome)</small></label>
+          <input id="dm-sub" type="text" autocomplete="off" maxlength="24">
+        </div>
+        <p class="aviso aviso--erro" id="dm-erro" role="alert" hidden></p>
+      </div>
+      <footer class="dlg__rodape">
+        <span class="espaco"></span>
+        <button class="btn btn--sec" type="button" data-fecha>Cancelar</button>
+        <button class="btn btn--prim" type="submit">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ========== CONECTAR AO GITHUB ========== -->
+  <dialog class="dlg dlg--peq" id="dlg-conectar" aria-labelledby="dc-titulo">
+    <form id="form-conectar" novalidate>
+      <header class="dlg__topo">
+        <h2 id="dc-titulo">Conectar ao site</h2>
+        <button class="fechar" type="button" data-fecha aria-label="Fechar">×</button>
+      </header>
+      <div class="dlg__corpo" id="dc-corpo">
+        <p class="aviso aviso--info" id="dc-estado" hidden></p>
+        <p>Para publicar, o painel precisa de uma <strong>chave de acesso</strong> do GitHub. Ela só precisa ser criada <strong>uma vez</strong> e fica guardada neste aparelho.</p>
+        <details class="recolhe" open>
+          <summary>Como criar a chave (passo a passo)</summary>
+          <ol class="passos-lista">
+            <li>Entre no GitHub com a conta dona do site e abra <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+            <li>Em <strong>Token name</strong>, escreva <em>Painel Cherry</em>. Em <strong>Expiration</strong>, escolha o maior prazo (1 ano).</li>
+            <li>Em <strong>Repository access</strong>, marque <strong>Only select repositories</strong> e escolha <strong>cherryfitwear</strong>.</li>
+            <li>Em <strong>Permissions → Repository permissions</strong>, procure <strong>Contents</strong> e mude para <strong>Read and write</strong>.</li>
+            <li>Clique em <strong>Generate token</strong>, copie o código que começa com <code>github_pat_</code> e cole abaixo.</li>
+          </ol>
+        </details>
+        <div class="campo">
+          <label for="dc-token">Chave de acesso</label>
+          <input id="dc-token" type="password" autocomplete="off" spellcheck="false" placeholder="github_pat_…">
+        </div>
+        <div class="campo">
+          <label for="dc-repo">Repositório do site</label>
+          <input id="dc-repo" type="text" autocomplete="off" spellcheck="false" placeholder="dono/nome-do-repositorio">
+        </div>
+        <label class="check"><input id="dc-lembrar" type="checkbox" checked> Lembrar neste aparelho</label>
+        <p class="aviso aviso--erro" id="dc-erro" role="alert" hidden></p>
+      </div>
+      <footer class="dlg__rodape">
+        <button class="btn btn--perigo btn--peq" id="dc-desconectar" type="button" hidden>Desconectar</button>
+        <span class="espaco"></span>
+        <button class="btn btn--sec" type="button" data-fecha>Cancelar</button>
+        <button class="btn btn--prim" type="submit" id="dc-conectar">Conectar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- ========== PUBLICAR ========== -->
+  <dialog class="dlg" id="dlg-publicar" aria-labelledby="pb-titulo">
+    <div id="pb-conteudo"></div>
+  </dialog>
+
+  <script src="js/admin-core.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
