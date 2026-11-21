@@ -32,13 +32,7 @@
     const proprios = limpaLista(p.tamanhos);
     return proprios.length ? proprios : (TAMANHOS_LOJA.length ? TAMANHOS_LOJA : ['P', 'M', 'G', 'GG']);
   };
-  const coresDe = (p) => limpaLista(p.cores);
-  // cada combinação cor + tamanho que o cliente pode pedir; a chave "codigo|cor|tamanho" identifica a linha no pedido
-  const variacoes = (p) => (coresDe(p).length ? coresDe(p) : ['']).flatMap((cor) => tamanhosDe(p).map((tam) => ({ p, cor, tam, chave: `${p.id}|${cor}|${tam}` })));
-  const variacaoPorChave = new Map(PRODUTOS.flatMap((p) => variacoes(p).map((v) => [v.chave, v])));
-  const rotuloVar = (v) => (v.cor ? `${v.cor} · ${v.tam}` : v.tam);
-
-  // bolinha de cor nas linhas (cores que não estão na lista aparecem só com o nome)
+  // cores conhecidas pelo nome (quando a peça só traz o nome da cor, sem o código dela)
   const CORES_HEX = {
     preto: '#1a1416', branco: '#ffffff', 'off white': '#f4efe6', vinho: '#7a0a2a', bordo: '#7a0a2a', cereja: '#cf2a5c',
     rosa: '#f6b3c4', 'rosa claro': '#fde0e8', pink: '#e0709a', rose: '#e8a6b4', vermelho: '#d62839', coral: '#ff7f6e',
@@ -46,7 +40,26 @@
     azul: '#3b6fb6', 'azul marinho': '#1d2b53', verde: '#3f8f6b', menta: '#a8dcc8', lilas: '#b69ad8', roxo: '#6b3fa0',
     amarelo: '#f2c744', laranja: '#f08a3c',
   };
-  const bolinha = (cor) => (CORES_HEX[normaliza(cor)] ? `<i class="var__cor" style="--c:${CORES_HEX[normaliza(cor)]}" aria-hidden="true"></i>` : '');
+  // cores da peça: { nome, cor (#hex), imagem (foto desta cor) }. Aceita também só o nome ('Preto').
+  const coresDe = (p) => {
+    const vistos = new Set();
+    return (Array.isArray(p.cores) ? p.cores : [])
+      .map((c) => (typeof c === 'string' ? { nome: c } : (c || {})))
+      .map((c) => {
+        const nome = String(c.nome || '').trim().replace(/\|/g, '/');
+        const hex = /^#[0-9a-f]{6}$/i.test(c.cor || '') ? c.cor : (CORES_HEX[normaliza(nome)] || '');
+        return { nome, hex, imagem: c.imagem || '' };
+      })
+      .filter((c) => c.nome && !vistos.has(c.nome.toLowerCase()) && vistos.add(c.nome.toLowerCase()));
+  };
+  // cada combinação cor + tamanho que o cliente pode pedir; a chave "codigo|cor|tamanho" identifica a linha no pedido
+  const variacoes = (p) => {
+    const cores = coresDe(p);
+    return (cores.length ? cores : [null]).flatMap((c) => tamanhosDe(p).map((tam) => ({ p, cor: c ? c.nome : '', corInfo: c, tam, chave: `${p.id}|${c ? c.nome : ''}|${tam}` })));
+  };
+  const variacaoPorChave = new Map(PRODUTOS.flatMap((p) => variacoes(p).map((v) => [v.chave, v])));
+  const rotuloVar = (v) => (v.cor ? `${v.cor} · ${v.tam}` : v.tam);
+  const bolinha = (c) => (c && c.hex ? `<i class="var__cor" style="--c:${c.hex}" aria-hidden="true"></i>` : '');
 
 
   // aviso "siga no Instagram e ganhe desconto" (some se o desconto for 0 ou se não houver perfis)
@@ -166,9 +179,10 @@
   };
   const ARTE_BASE = { forma: 'legging', corpo: '#2a2326', tampa: '#e35f68', texto: '#ffffff' };
 
-  function midia(p, comAlt = true) {
+  // corpo: cor da ilustração (só usada quando não há foto), para mostrar a peça na cor da variação
+  function midia(p, comAlt = true, corpo = '') {
     if (p.imagem) return `<img src="${esc(p.imagem)}" alt="${comAlt ? esc(`${marcaPorId[p.marca].nome} ${p.nome}`) : ''}" loading="lazy" decoding="async">`;
-    const arte = { ...ARTE_BASE, ...(p.arte || {}) };
+    const arte = { ...ARTE_BASE, ...(p.arte || {}), ...(corpo ? { corpo } : {}) };
     const forma = FORMAS[arte.forma] || FORMAS.legging;
     return `<svg class="arte" viewBox="0 0 200 220" aria-hidden="true" focusable="false">${forma(arte)}</svg>`;
   }
@@ -242,16 +256,26 @@
     return `<button class="btn-add" type="button" data-f="escolher">${coresDe(p).length ? 'Escolher cor e tamanho' : 'Escolher tamanho'}${sr}</button>`;
   }
 
-  // bloco "Escolha as variações" da página da peça: uma linha por tamanho (ou cor + tamanho)
+  // miniatura da linha: foto da cor, senão a foto da peça, senão a ilustração na cor da variação
+  function miniatura(p, v) {
+    const foto = v.corInfo && v.corInfo.imagem;
+    if (foto) return `<img src="${esc(foto)}" alt="" loading="lazy" decoding="async">`;
+    return midia(p, false, v.corInfo ? v.corInfo.hex : '');
+  }
+
+  // bloco "Escolha as variações" da página da peça: uma linha por cor + tamanho (MENTA P, MENTA M, MENTA G…)
   function blocoVariacoes(p) {
     if (!temPreco(p)) return '';
     const comCor = coresDe(p).length > 0;
+    let corAnterior = null;
     const linhas = variacoes(p).map((v) => {
       const q = pedido[v.chave] || 0;
       const nome = `${v.cor ? `${v.cor}, ` : ''}tamanho ${v.tam}, ${p.nome}`;
-      return `<li class="var${q ? ' var--ativa' : ''}" data-id="${p.id}" data-v="${esc(v.chave)}">
-          <span class="var__tam" aria-hidden="true">${esc(v.tam)}</span>
-          <span class="var__nome">${v.cor ? `${bolinha(v.cor)}${esc(v.cor)}` : `Tamanho ${esc(v.tam)}`}</span>
+      const nova = corAnterior !== null && v.cor !== corAnterior;
+      corAnterior = v.cor;
+      return `<li class="var${q ? ' var--ativa' : ''}${nova ? ' var--nova-cor' : ''}" data-id="${p.id}" data-v="${esc(v.chave)}">
+          <span class="var__foto">${miniatura(p, v)}</span>
+          <span class="var__nome">${bolinha(v.corInfo)}<span>${v.cor ? `${esc(v.cor)} ${esc(v.tam)}` : `Tamanho ${esc(v.tam)}`}</span></span>
           ${seletorQtd(nome, q)}
         </li>`;
     }).join('');
@@ -367,7 +391,7 @@
   function itemCarrinho({ p, linhas }) {
     const antigo = p.precoAntigo ? `<s>${moeda(p.precoAntigo)}</s> ` : '';
     const porLinha = linhas.map(({ v, q }) => `<li class="item__var" data-v="${esc(v.chave)}">
-          <span class="item__tam">${bolinha(v.cor)}${esc(rotuloVar(v))}</span>
+          <span class="item__tam">${bolinha(v.corInfo)}${esc(rotuloVar(v))}</span>
           ${seletorQtd(`${rotuloVar(v)}, ${p.nome}`, q, 'qtd--mini')}
           <strong>${moeda(p.preco * q)}</strong>
           <button class="item__remover" type="button" data-f="remover" aria-label="Remover ${esc(p.nome)} ${esc(rotuloVar(v))} do pedido">
@@ -470,7 +494,10 @@
     if (!variacaoPorChave.has(chave)) return;
     const q = pedido[chave] || 0;
     switch (f) {
-      case 'mais': defineQtd(chave, q + 1); break;
+      case 'mais':
+        defineQtd(chave, q + 1);
+        mostraFotoDaCor(variacaoPorChave.get(chave));
+        break;
       case 'menos': defineQtd(chave, q - 1); break;
       case 'remover': defineQtd(chave, 0); break;
       default:
@@ -537,13 +564,24 @@
     history.replaceState(null, '', `#produto=${id}`);
   }
 
+  function trocaFoto(caminho) {
+    const principal = $('[data-principal]', conteudoDetalhe);
+    if (!principal) return;
+    principal.src = caminho;
+    $$('[data-foto]', conteudoDetalhe).forEach((x) => { if (x.dataset.foto === caminho) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); });
+  }
+
   // trocar a foto grande ao tocar numa miniatura
   conteudoDetalhe.addEventListener('click', (e) => {
     const b = e.target.closest('[data-foto]');
-    if (!b) return;
-    $('[data-principal]', conteudoDetalhe).src = b.dataset.foto;
-    $$('[data-foto]', conteudoDetalhe).forEach((x) => { if (x === b) x.setAttribute('aria-current', 'true'); else x.removeAttribute('aria-current'); });
+    if (b) trocaFoto(b.dataset.foto);
   });
+
+  // ao escolher uma cor, a foto grande mostra a peça nessa cor (se a cor tiver foto)
+  function mostraFotoDaCor(v) {
+    const foto = v && v.corInfo && v.corInfo.imagem;
+    if (foto) trocaFoto(foto);
+  }
 
   detalhe.addEventListener('painelfechado', () => {
     if (location.hash.startsWith('#produto=')) history.replaceState(null, '', location.pathname + location.search);

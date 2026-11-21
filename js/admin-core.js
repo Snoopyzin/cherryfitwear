@@ -436,9 +436,11 @@
       if (!String(p.nome || '').trim()) erros.push({ id: p.id, texto: `Há um produto sem nome (${p.id})` });
       if (!marcas.has(p.marca)) erros.push({ id: p.id, texto: `“${nome}” está sem uma coleção válida` });
       if (p.galeria !== undefined && !(Array.isArray(p.galeria) && p.galeria.every((f) => typeof f === 'string' && f))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de fotos num formato inválido` });
-      for (const k of ['tamanhos', 'cores']) {
-        if (p[k] !== undefined && !(Array.isArray(p[k]) && p[k].length <= 20 && p[k].every((x) => typeof x === 'string' && x.trim()))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de ${k} num formato inválido` });
-      }
+      if (p.tamanhos !== undefined && !(Array.isArray(p.tamanhos) && p.tamanhos.length <= 20 && p.tamanhos.every((x) => typeof x === 'string' && x.trim()))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de tamanhos num formato inválido` });
+      // cor = só o nome ('Preto') ou { nome, cor: '#rrggbb', imagem: 'images/produtos/…' }
+      const corOk = (x) => (typeof x === 'string' && x.trim())
+        || (x && typeof x === 'object' && typeof x.nome === 'string' && x.nome.trim() && (x.cor === undefined || /^#[0-9a-f]{6}$/i.test(x.cor)) && (x.imagem === undefined || typeof x.imagem === 'string'));
+      if (p.cores !== undefined && !(Array.isArray(p.cores) && p.cores.length <= 20 && p.cores.every(corOk))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de cores num formato inválido` });
       if (!['leggings', 'tops', 'shorts', 'conjuntos', 'jaquetas'].includes(p.categoria)) erros.push({ id: p.id, texto: `“${nome}” está sem categoria` });
       for (const k of ['preco', 'precoAntigo']) {
         const v = p[k];

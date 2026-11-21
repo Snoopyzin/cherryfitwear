@@ -278,17 +278,18 @@
           <p class="campo__ajuda">Em produtos em promoção, o site mostra a porcentagem de desconto no lugar da etiqueta.</p>
         </div>
 
-        <div class="par">
-          <div class="campo">
-            <label for="dp-tamanhos">Tamanhos <small>(separe por vírgula)</small></label>
-            <input id="dp-tamanhos" name="tamanhos" type="text" autocomplete="off" placeholder="Vazio = tamanhos padrão da loja">
-          </div>
-          <div class="campo">
-            <label for="dp-cores">Cores <small>(opcional)</small></label>
-            <input id="dp-cores" name="cores" type="text" autocomplete="off" placeholder="Ex.: Preto, Vinho, Rosa">
-          </div>
+        <h3 class="subtitulo">Tamanhos e cores</h3>
+        <div class="campo">
+          <label for="dp-tamanhos">Tamanhos <small>(separe por vírgula)</small></label>
+          <input id="dp-tamanhos" name="tamanhos" type="text" autocomplete="off" placeholder="Vazio = tamanhos padrão da loja (P, M, G, GG)">
         </div>
-        <p class="campo__ajuda">No site, o cliente escolhe a quantidade de cada tamanho (e de cada cor, se você listar cores). Se a peça tem uma cor só, deixe “Cores” vazio.</p>
+        <div class="campo">
+          <span class="rotulo" id="dp-cores-rotulo">Cores <small>(opcional)</small></span>
+          <div class="cores-ed" id="dp-cores" role="group" aria-labelledby="dp-cores-rotulo"></div>
+          <div class="cores-presets" id="dp-cores-presets" role="group" aria-label="Adicionar uma cor pronta"></div>
+          <button class="btn btn--sec btn--peq" id="dp-cor-nova" type="button">+ Outra cor</button>
+          <p class="campo__ajuda">No site, o cliente escolhe a quantidade de cada tamanho <strong>em cada cor</strong> (Menta P, Menta M, Menta G…). Em “Foto desta cor”, escolha qual das fotos da peça mostra essa cor; suba as fotos em “Fotos” aqui embaixo. Se a peça tem uma cor só, deixe sem cores.</p>
+        </div>
 
         <details class="recolhe" id="dp-desc-det">
           <summary>Descrição completa <small>(aparece em “Ver detalhes”)</small></summary>

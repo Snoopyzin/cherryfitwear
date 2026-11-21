@@ -109,7 +109,7 @@
     if (e.status === 403) {
       return /rate limit/i.test(e.message)
         ? 'O GitHub pediu para aguardar um pouco. Tente de novo em alguns minutos.'
-        : 'A chave de acesso não tem permissão para alterar o site. Ela precisa de “Contents: Read and write” no repositório.';
+        : 'A chave de acesso não tem permissão para alterar o site. No GitHub, abra a chave e confira: “Repository access” = Only select repositories (com o repositório do site marcado) e “Contents” = Read and write.';
     }
     if (e.status === 404) return 'Não encontrei o repositório. Confira o nome (dono/repositório) e se a chave tem acesso a ele.';
     if (e.status === 409 || e.status === 422) return 'Alguém publicou ao mesmo tempo. Tente publicar de novo.';
@@ -586,7 +586,7 @@
   const dp = {
     dlg: $('#dlg-produto'), form: $('#form-produto'),
     nome: $('#dp-nome'), tipo: $('#dp-tipo'), marca: $('#dp-marca'), categoria: $('#dp-categoria'), selo: $('#dp-selo'),
-    tamanhos: $('#dp-tamanhos'), cores: $('#dp-cores'),
+    tamanhos: $('#dp-tamanhos'), cores: $('#dp-cores'), coresPresets: $('#dp-cores-presets'), corNova: $('#dp-cor-nova'),
     promo: $('#dp-promo'), antigoCampos: $('#dp-promo-campos'), precoRotulo: $('#dp-preco-rotulo'),
     preco: $('#dp-preco'), antigo: $('#dp-antigo'),
     resumo: $('#dp-resumo'), serve: $('#dp-serve'), beneficios: $('#dp-beneficios'), ativos: $('#dp-ativos'), rotina: $('#dp-rotina'), importante: $('#dp-importante'),
@@ -595,6 +595,66 @@
   };
   dp.forma.innerHTML = FORMAS.map(([v, t]) => `<option value="${v}">${t}</option>`).join('');
   let ed = null;
+
+  /* ---------- Produto: cores (nome, cor e foto de cada uma) ---------- */
+
+  const PRESET_CORES = [['Preto', '#1a1416'], ['Branco', '#ffffff'], ['Off white', '#f4efe6'], ['Vinho', '#7a0a2a'], ['Rosa', '#f6b3c4'], ['Pink', '#e0709a'], ['Vermelho', '#d62839'], ['Cinza', '#8a8587'], ['Grafite', '#3b3639'], ['Nude', '#d9b8a3'], ['Bege', '#d8c3a5'], ['Marrom', '#6b4a3a'], ['Azul', '#3b6fb6'], ['Verde', '#3f8f6b'], ['Menta', '#a8dcc8'], ['Lilás', '#b69ad8']];
+  dp.coresPresets.innerHTML = PRESET_CORES.map(([n, h]) => `<button class="preset-cor" type="button" data-preset="${esc(n)}" style="--c:${h}"><i aria-hidden="true"></i>${esc(n)}</button>`).join('');
+  const hexDe = (nome) => (PRESET_CORES.find(([n]) => norm(n) === norm(nome)) || [])[1];
+
+  // lista de cores no formulário; cada cor guarda a foto escolhida como o próprio item de ed.fotos (acompanha trocas de ordem)
+  function desenhaCores() {
+    if (!ed || !ed.cores) return;
+    for (const c of ed.cores) if (c.foto && !ed.fotos.includes(c.foto)) c.foto = null;
+    dp.cores.innerHTML = ed.cores.length
+      ? ed.cores.map((c, i) => `<div class="cor-ed" data-i="${i}">
+          <input type="color" value="${esc(c.cor)}" data-campo="cor" aria-label="Cor ${esc(c.nome || i + 1)}">
+          <input type="text" value="${esc(c.nome)}" maxlength="24" placeholder="Nome da cor (ex.: Menta)" data-campo="nome" aria-label="Nome da cor ${i + 1}" autocomplete="off">
+          <select data-campo="foto" aria-label="Foto da cor ${esc(c.nome || i + 1)}">
+            <option value="-1">Sem foto específica</option>
+            ${ed.fotos.map((f, j) => `<option value="${j}"${c.foto === f ? ' selected' : ''}>Foto ${j + 1}${j === 0 ? ' (principal)' : ''}</option>`).join('')}
+          </select>
+          <button class="mini" type="button" data-cor-acao="remover" aria-label="Remover a cor ${esc(c.nome || i + 1)}">✕</button>
+        </div>`).join('')
+      : '<p class="campo__ajuda">Nenhuma cor: o site mostra só os tamanhos.</p>';
+  }
+
+  dp.cores.addEventListener('input', (e) => {
+    const linha = e.target.closest('.cor-ed');
+    if (!linha) return;
+    const c = ed.cores[Number(linha.dataset.i)];
+    if (e.target.dataset.campo === 'nome') c.nome = e.target.value;
+    if (e.target.dataset.campo === 'cor') { c.cor = e.target.value; c.corManual = true; }
+  });
+  dp.cores.addEventListener('change', (e) => {
+    const linha = e.target.closest('.cor-ed');
+    if (!linha) return;
+    const c = ed.cores[Number(linha.dataset.i)];
+    const campo = e.target.dataset.campo;
+    if (campo === 'foto') { const j = Number(e.target.value); c.foto = j >= 0 ? ed.fotos[j] : null; }
+    // nome conhecido (Preto, Menta…) e cor ainda não escolhida à mão: já coloca o tom certo
+    if (campo === 'nome' && !c.corManual && hexDe(e.target.value)) { c.cor = hexDe(e.target.value); $('[data-campo="cor"]', linha).value = c.cor; }
+  });
+  dp.cores.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cor-acao="remover"]');
+    if (!b) return;
+    ed.cores.splice(Number(b.closest('.cor-ed').dataset.i), 1);
+    desenhaCores();
+  });
+  dp.coresPresets.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-preset]');
+    if (!b) return;
+    const nome = b.dataset.preset;
+    if (ed.cores.some((c) => norm(c.nome) === norm(nome))) return;
+    ed.cores.push({ nome, cor: hexDe(nome), foto: null });
+    desenhaCores();
+  });
+  dp.corNova.addEventListener('click', () => {
+    ed.cores.push({ nome: '', cor: '#cccccc', foto: null });
+    desenhaCores();
+    const campos = $$('.cor-ed [data-campo="nome"]', dp.cores);
+    foca(campos[campos.length - 1]);
+  });
 
   const NOVA_MARCA = '__nova__';
   function preencheMarcasProduto(selecionada) {
@@ -645,6 +705,7 @@
           </div>
         </li>`).join('')
       : '<li class="foto-vazia">Nenhuma foto ainda. O site vai mostrar uma ilustração da peça.</li>';
+    desenhaCores();   // as fotos mudaram: atualiza as opções de "Foto desta cor"
   }
 
   function abreProduto(id) {
@@ -655,6 +716,10 @@
       nome: '', tipo: '', preco: null, imagem: '', arte: { ...ARTE_PADRAO },
     };
     ed = { novo: !existente, p, desc: existente ? Core.clonar(S.atual.descricoes[id]) || null : null, fotos: todasFotos(p).map((c) => ({ caminho: c })), fotosAntes: todasFotos(p) };
+    ed.cores = (p.cores || []).map((c) => {
+      const o = typeof c === 'string' ? { nome: c } : c;
+      return { nome: o.nome || '', cor: /^#[0-9a-f]{6}$/i.test(o.cor || '') ? o.cor : (hexDe(o.nome) || '#cccccc'), foto: o.imagem ? ed.fotos.find((f) => f.caminho === o.imagem) || null : null, corManual: true };
+    });
 
     $('#dp-titulo').textContent = existente ? 'Editar produto' : 'Novo produto';
     dp.nome.value = p.nome;
@@ -663,7 +728,6 @@
     dp.categoria.value = p.categoria;
     dp.selo.value = p.selo || '';
     dp.tamanhos.value = (p.tamanhos || []).join(', ');
-    dp.cores.value = (p.cores || []).join(', ');
     dp.preco.value = Core.formatarReais(p.preco);
     dp.antigo.value = Core.formatarReais(p.precoAntigo);
     dp.promo.checked = typeof p.precoAntigo === 'number';
@@ -734,6 +798,8 @@
     e.preventDefault();
     const nome = dp.nome.value.trim();
     if (!nome) return erroProduto('Digite o nome do produto.', dp.nome);
+    const nomesCor = ed.cores.map((c) => norm(c.nome.trim())).filter(Boolean);
+    if (new Set(nomesCor).size !== nomesCor.length) return erroProduto('Há duas cores com o mesmo nome. Deixe cada cor com um nome diferente.');
     const promoLigada = dp.promo.checked;
     const brutoPreco = dp.preco.value.trim();
     const porcento = promoLigada && brutoPreco.endsWith('%');
@@ -759,8 +825,6 @@
     if (selo) p.selo = selo; else delete p.selo;
     const tamanhos = Core.lerLista(dp.tamanhos.value);
     if (tamanhos.length) p.tamanhos = tamanhos; else delete p.tamanhos;
-    const cores = Core.lerLista(dp.cores.value);
-    if (cores.length) p.cores = cores; else delete p.cores;
     p.preco = preco;
     delete p.preco30;
     if (antigo === null) delete p.precoAntigo; else p.precoAntigo = antigo;
@@ -781,6 +845,14 @@
     });
     p.imagem = caminhos[0] || '';
     if (caminhos.length > 1) p.galeria = caminhos.slice(1); else delete p.galeria;
+    // cores: nome, tom e (se escolhida) a foto que mostra essa cor
+    const cores = ed.cores.filter((c) => c.nome.trim()).map((c) => {
+      const o = { nome: c.nome.trim(), cor: c.cor };
+      const j = c.foto ? ed.fotos.indexOf(c.foto) : -1;
+      if (j >= 0 && caminhos[j]) o.imagem = caminhos[j];
+      return o;
+    });
+    if (cores.length) p.cores = cores; else delete p.cores;
     // fotos tiradas que ainda não tinham sido publicadas deixam de esperar o envio
     for (const antiga of ed.fotosAntes) if (!caminhos.includes(antiga) && S.fotos.has(antiga)) S.fotos.delete(antiga);
 
@@ -1366,7 +1438,7 @@
   };
   const fmtValor = (k, v) => {
     if (v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length)) return 'vazio';
-    if (Array.isArray(v)) return `“${v.join(', ')}”`;
+    if (Array.isArray(v)) return `“${v.map((x) => (x && x.nome) || x).join(', ')}”`;
     if (typeof v === 'number') return brl(v);
     if (k === 'imagem') return 'foto';
     if (k === 'arte') return 'novas cores/formato';
