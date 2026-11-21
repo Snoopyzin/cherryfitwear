@@ -25,7 +25,7 @@
   const FORMAS = [['legging', 'Legging'], ['flare', 'Calça flare'], ['biker', 'Biker'], ['shorts', 'Shorts'], ['top', 'Top'], ['regata', 'Regata'], ['macacao', 'Macacão'], ['conjunto', 'Conjunto top + biker'], ['conjunto-flare', 'Conjunto top + calça flare'], ['jaqueta', 'Jaqueta']];
   const ESTILOS = [['sans', 'Moderna em negrito'], ['sans-leve', 'Moderna leve'], ['espacado', 'Letras espaçadas'], ['script', 'Cursiva'], ['serif', 'Elegante com serifa']];
   const ARTE_PADRAO = { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' };
-  const ROTULOS = { preco: 'Preço', precoAntigo: 'Preço antigo', nome: 'Nome', tipo: 'Texto curto', marca: 'Coleção', categoria: 'Categoria', selo: 'Etiqueta', imagem: 'Foto', arte: 'Ilustração', galeria: 'Fotos extras' };
+  const ROTULOS = { preco: 'Preço', precoAntigo: 'Preço antigo', nome: 'Nome', tipo: 'Texto curto', marca: 'Coleção', categoria: 'Categoria', selo: 'Etiqueta', imagem: 'Foto', arte: 'Ilustração', galeria: 'Fotos extras', tamanhos: 'Tamanhos', cores: 'Cores' };
 
   const S = {
     original: null,            // como está no site
@@ -586,6 +586,7 @@
   const dp = {
     dlg: $('#dlg-produto'), form: $('#form-produto'),
     nome: $('#dp-nome'), tipo: $('#dp-tipo'), marca: $('#dp-marca'), categoria: $('#dp-categoria'), selo: $('#dp-selo'),
+    tamanhos: $('#dp-tamanhos'), cores: $('#dp-cores'),
     promo: $('#dp-promo'), antigoCampos: $('#dp-promo-campos'), precoRotulo: $('#dp-preco-rotulo'),
     preco: $('#dp-preco'), antigo: $('#dp-antigo'),
     resumo: $('#dp-resumo'), serve: $('#dp-serve'), beneficios: $('#dp-beneficios'), ativos: $('#dp-ativos'), rotina: $('#dp-rotina'), importante: $('#dp-importante'),
@@ -661,6 +662,8 @@
     preencheMarcasProduto(p.marca);
     dp.categoria.value = p.categoria;
     dp.selo.value = p.selo || '';
+    dp.tamanhos.value = (p.tamanhos || []).join(', ');
+    dp.cores.value = (p.cores || []).join(', ');
     dp.preco.value = Core.formatarReais(p.preco);
     dp.antigo.value = Core.formatarReais(p.precoAntigo);
     dp.promo.checked = typeof p.precoAntigo === 'number';
@@ -754,6 +757,10 @@
     p.categoria = dp.categoria.value;
     const selo = dp.selo.value.trim();
     if (selo) p.selo = selo; else delete p.selo;
+    const tamanhos = Core.lerLista(dp.tamanhos.value);
+    if (tamanhos.length) p.tamanhos = tamanhos; else delete p.tamanhos;
+    const cores = Core.lerLista(dp.cores.value);
+    if (cores.length) p.cores = cores; else delete p.cores;
     p.preco = preco;
     delete p.preco30;
     if (antigo === null) delete p.precoAntigo; else p.precoAntigo = antigo;
@@ -1358,7 +1365,8 @@
     return p ? p.nome : id;
   };
   const fmtValor = (k, v) => {
-    if (v === undefined || v === null || v === '') return 'vazio';
+    if (v === undefined || v === null || v === '' || (Array.isArray(v) && !v.length)) return 'vazio';
+    if (Array.isArray(v)) return `“${v.join(', ')}”`;
     if (typeof v === 'number') return brl(v);
     if (k === 'imagem') return 'foto';
     if (k === 'arte') return 'novas cores/formato';

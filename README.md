@@ -16,6 +16,7 @@ Loja virtual estática (HTML/CSS/JS), pensada para publicar no GitHub Pages. O c
 Página para editar preços, peças, fotos, coleções e o contato sem mexer em código. Acesso: `https://<site>/admin.html` (sem link no site e marcada como `noindex`).
 
 - **Produtos:** preço direto na lista; botão **Promoção** (o preço de hoje vira o "antigo" riscado); criar, editar e excluir peças com até 10 fotos (convertidas para WebP quadrado de até 800 px) e descrição completa.
+- **Tamanhos e cores:** em cada peça, os campos **Tamanhos** e **Cores** (separados por vírgula). No site, o cliente abre a peça e escolhe a quantidade de cada tamanho (ou de cada cor + tamanho) com os botões − e +; o pedido chega no WhatsApp já com a grade. Tamanhos vazios = a lista padrão da loja (`tamanhos` em `CHERRY_CONFIG`, hoje P, M, G, GG); cores vazias = peça de uma cor só.
 - **Vitrine:** escolher o que aparece em **Promoções!**, marcar **Lançamentos** e criar as próprias seções ("Mais vendidos", "Conjuntos"…).
 - **Coleções:** as linhas da loja (Signature, Essential, Seamless…) que aparecem na seção "Coleções". Cadastre a coleção antes de criar peças dela.
 - **Contato:** WhatsApp, mensagem do botão e o desconto por seguir no Instagram.

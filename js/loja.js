@@ -24,6 +24,30 @@
   const moeda = (v) => (Number.isInteger(v) ? brlInteiro : brl).format(v);
   const pecas = (n) => `${n} ${n === 1 ? 'peça' : 'peças'}`;
 
+  /* ---------- Variações: tamanho (e cor, quando a peça tem) ---------- */
+
+  const limpaLista = (l) => [...new Set((Array.isArray(l) ? l : []).map((x) => String(x).trim().replace(/\|/g, '/')).filter(Boolean))];
+  const TAMANHOS_LOJA = limpaLista(window.CHERRY_CONFIG.tamanhos);
+  const tamanhosDe = (p) => {
+    const proprios = limpaLista(p.tamanhos);
+    return proprios.length ? proprios : (TAMANHOS_LOJA.length ? TAMANHOS_LOJA : ['P', 'M', 'G', 'GG']);
+  };
+  const coresDe = (p) => limpaLista(p.cores);
+  // cada combinação cor + tamanho que o cliente pode pedir; a chave "codigo|cor|tamanho" identifica a linha no pedido
+  const variacoes = (p) => (coresDe(p).length ? coresDe(p) : ['']).flatMap((cor) => tamanhosDe(p).map((tam) => ({ p, cor, tam, chave: `${p.id}|${cor}|${tam}` })));
+  const variacaoPorChave = new Map(PRODUTOS.flatMap((p) => variacoes(p).map((v) => [v.chave, v])));
+  const rotuloVar = (v) => (v.cor ? `${v.cor} · ${v.tam}` : v.tam);
+
+  // bolinha de cor nas linhas (cores que não estão na lista aparecem só com o nome)
+  const CORES_HEX = {
+    preto: '#1a1416', branco: '#ffffff', 'off white': '#f4efe6', vinho: '#7a0a2a', bordo: '#7a0a2a', cereja: '#cf2a5c',
+    rosa: '#f6b3c4', 'rosa claro': '#fde0e8', pink: '#e0709a', rose: '#e8a6b4', vermelho: '#d62839', coral: '#ff7f6e',
+    cinza: '#8a8587', grafite: '#3b3639', chumbo: '#4a4548', taupe: '#7d7468', nude: '#d9b8a3', bege: '#d8c3a5', marrom: '#6b4a3a',
+    azul: '#3b6fb6', 'azul marinho': '#1d2b53', verde: '#3f8f6b', menta: '#a8dcc8', lilas: '#b69ad8', roxo: '#6b3fa0',
+    amarelo: '#f2c744', laranja: '#f08a3c',
+  };
+  const bolinha = (cor) => (CORES_HEX[normaliza(cor)] ? `<i class="var__cor" style="--c:${CORES_HEX[normaliza(cor)]}" aria-hidden="true"></i>` : '');
+
 
   // aviso "siga no Instagram e ganhe desconto" (some se o desconto for 0 ou se não houver perfis)
   const ICONE_INSTA = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".9"/></svg>';
@@ -166,12 +190,16 @@
 
   /* ---------- Pedido (carrinho) ---------- */
 
-  const CHAVE = 'cherry-fitwear:pedido';
+  // pedido = { "codigo|cor|tamanho": quantidade }
+  const CHAVE = 'cherry-fitwear:pedido-v2';
   const CHAVE_OBS = 'cherry-fitwear:obs';
   let pedido = {};
   try { pedido = JSON.parse(localStorage.getItem(CHAVE)) || {}; } catch { pedido = {}; }
-  for (const id of Object.keys(pedido)) {
-    if (!produtoPorId[id] || !temPreco(produtoPorId[id]) || !(pedido[id] > 0)) delete pedido[id];
+  try { localStorage.removeItem('cherry-fitwear:pedido'); } catch { /* sem armazenamento */ }
+  // descarta linhas de peças ou tamanhos que não existem mais
+  for (const k of Object.keys(pedido)) {
+    const v = variacaoPorChave.get(k);
+    if (!v || !temPreco(v.p) || !(pedido[k] > 0)) delete pedido[k];
   }
   const salva = () => { try { localStorage.setItem(CHAVE, JSON.stringify(pedido)); } catch { /* sem armazenamento: segue só na sessão */ } };
 
@@ -183,20 +211,70 @@
   }
 
   const unidades = () => Object.values(pedido).reduce((s, q) => s + q, 0);
-  const total = () => Object.entries(pedido).reduce((s, [id, q]) => s + produtoPorId[id].preco * q, 0);
+  const total = () => Object.entries(pedido).reduce((s, [k, q]) => s + variacaoPorChave.get(k).p.preco * q, 0);
+  const qtdDoProduto = (id) => Object.entries(pedido).reduce((s, [k, q]) => (k.startsWith(`${id}|`) ? s + q : s), 0);
 
-  function seletorQtd(p, q, extra = '') {
+  // as linhas do pedido agrupadas por peça, na ordem em que cada peça entrou
+  function pedidoPorPeca() {
+    const grupos = new Map();
+    for (const [k, q] of Object.entries(pedido)) {
+      const v = variacaoPorChave.get(k);
+      if (!grupos.has(v.p.id)) grupos.set(v.p.id, { p: v.p, linhas: [] });
+      grupos.get(v.p.id).linhas.push({ v, q });
+    }
+    return [...grupos.values()];
+  }
+
+  function seletorQtd(nome, q, extra = '') {
     return `<div class="qtd ${extra}">
-        <button type="button" data-f="menos" aria-label="Diminuir quantidade de ${esc(p.nome)}">−</button>
-        <input type="number" inputmode="numeric" min="0" max="999" value="${q}" data-f="qtd" aria-label="Quantidade de ${esc(p.nome)}">
-        <button type="button" data-f="mais" aria-label="Aumentar quantidade de ${esc(p.nome)}">+</button>
+        <button type="button" data-f="menos" aria-label="Diminuir quantidade de ${esc(nome)}">−</button>
+        <input type="number" inputmode="numeric" min="0" max="999" value="${q}" data-f="qtd" aria-label="Quantidade de ${esc(nome)}">
+        <button type="button" data-f="mais" aria-label="Aumentar quantidade de ${esc(nome)}">+</button>
       </div>`;
   }
 
+  // botão do card: abre a peça para escolher tamanho (e cor) e quantidades
   function acao(p) {
     if (!temPreco(p)) return '<button class="btn-add" type="button" disabled>Em breve</button>';
-    if (pedido[p.id]) return seletorQtd(p, pedido[p.id]);
-    return `<button class="btn-add" type="button" data-f="add">Adicionar<span class="sr-only"> ${esc(p.nome)} ao pedido</span></button>`;
+    const n = qtdDoProduto(p.id);
+    const sr = `<span class="sr-only"> ${esc(p.nome)}</span>`;
+    if (n) return `<button class="btn-add btn-add--no-pedido" type="button" data-f="escolher">✓ ${n} no pedido · editar${sr}</button>`;
+    return `<button class="btn-add" type="button" data-f="escolher">${coresDe(p).length ? 'Escolher cor e tamanho' : 'Escolher tamanho'}${sr}</button>`;
+  }
+
+  // bloco "Escolha as variações" da página da peça: uma linha por tamanho (ou cor + tamanho)
+  function blocoVariacoes(p) {
+    if (!temPreco(p)) return '';
+    const comCor = coresDe(p).length > 0;
+    const linhas = variacoes(p).map((v) => {
+      const q = pedido[v.chave] || 0;
+      const nome = `${v.cor ? `${v.cor}, ` : ''}tamanho ${v.tam}, ${p.nome}`;
+      return `<li class="var${q ? ' var--ativa' : ''}" data-id="${p.id}" data-v="${esc(v.chave)}">
+          <span class="var__tam" aria-hidden="true">${esc(v.tam)}</span>
+          <span class="var__nome">${v.cor ? `${bolinha(v.cor)}${esc(v.cor)}` : `Tamanho ${esc(v.tam)}`}</span>
+          ${seletorQtd(nome, q)}
+        </li>`;
+    }).join('');
+    return `<section class="variacoes" data-id="${p.id}" aria-labelledby="variacoes-titulo">
+        <h3 class="variacoes__titulo" id="variacoes-titulo">${comCor ? 'Escolha as variações' : 'Escolha o tamanho'}</h3>
+        <p class="variacoes__ajuda">Toque em + para dizer quantas peças de cada ${comCor ? 'cor e tamanho' : 'tamanho'} você quer.</p>
+        <ul class="variacoes__lista">${linhas}</ul>
+        <p class="variacoes__resumo" aria-live="polite"></p>
+        <button class="btn btn--primario variacoes__ver" type="button" data-f="ver-pedido" hidden></button>
+      </section>`;
+  }
+
+  // resumo e botão "Ver pedido" da página da peça
+  function atualizaResumo(id) {
+    const p = produtoPorId[id];
+    const n = qtdDoProduto(id);
+    const todas = unidades();
+    $$(`.variacoes[data-id="${id}"]`).forEach((bloco) => {
+      $('.variacoes__resumo', bloco).textContent = n ? `${pecas(n)} deste modelo · ${moeda(n * p.preco)}` : 'Nenhuma peça escolhida ainda.';
+      const ver = $('.variacoes__ver', bloco);
+      ver.hidden = !todas;
+      ver.textContent = `Ver pedido · ${pecas(todas)}`;
+    });
   }
 
   function cartao(p) {
@@ -216,18 +294,22 @@
   }
 
   // recoloca o foco no controle equivalente depois de redesenhar
-  const FOCO_ALTERNATIVO = { add: 'mais', mais: 'menos', menos: 'add', qtd: 'add', remover: null };
+  const FOCO_ALTERNATIVO = { escolher: 'escolher', mais: 'menos', menos: 'mais', qtd: 'mais', remover: null };
   function comFoco(raiz, desenha) {
     const ativo = document.activeElement;
     const papel = ativo && raiz.contains(ativo) ? ativo.dataset.f : null;
-    const id = papel ? ativo.closest('[data-id]')?.dataset.id : null;
+    // a linha do pedido (data-v) vale mais que a peça (data-id): uma peça pode ter várias linhas
+    const dono = papel ? ativo.closest('[data-v], [data-id]') : null;
+    const attr = dono?.dataset.v ? 'data-v' : 'data-id';
+    const valor = dono ? (dono.dataset.v || dono.dataset.id) : null;
     desenha();
-    if (!papel || !id) return;
-    const alvo = $(`[data-id="${id}"] [data-f="${papel}"]`, raiz) || $(`[data-id="${id}"] [data-f="${FOCO_ALTERNATIVO[papel]}"]`, raiz);
+    if (!papel || !valor) return;
+    const dentro = `[${attr}="${CSS.escape(valor)}"]`;
+    const alvo = $(`${dentro} [data-f="${papel}"]`, raiz) || $(`${dentro} [data-f="${FOCO_ALTERNATIVO[papel]}"]`, raiz);
     (alvo || $('[data-foco]', raiz.closest('.painel') || document) || raiz).focus?.();
   }
 
-  // atualiza os botões do produto em todos os lugares (cards e detalhes)
+  // atualiza o botão do produto em todos os cards
   function atualizaAcoes(id) {
     const p = produtoPorId[id];
     $$(`.produto__acao[data-id="${id}"]`).forEach((el) => comFoco(el, () => { el.innerHTML = acao(p); }));
@@ -242,16 +324,31 @@
     toastTempo = setTimeout(() => toast.classList.remove('visivel'), 3000);
   }
 
-  function defineQtd(id, qtd) {
-    if (!temPreco(produtoPorId[id])) return;
-    const antes = pedido[id] || 0;
-    qtd = Math.max(0, Math.min(999, Math.floor(Number(qtd)) || 0));
-    if (qtd === antes) { atualizaAcoes(id); atualizaCarrinho(); return; }
-    if (qtd) pedido[id] = qtd; else delete pedido[id];
-    salva();
+  // mostra a quantidade de uma linha em todos os lugares, sem redesenhar a lista da página da peça (o foco fica onde está)
+  function sincroniza(chave) {
+    const id = variacaoPorChave.get(chave).p.id;
+    const q = pedido[chave] || 0;
     atualizaAcoes(id);
+    $$(`.variacoes .var[data-v="${CSS.escape(chave)}"]`).forEach((linha) => {
+      linha.classList.toggle('var--ativa', q > 0);
+      $('[data-f="qtd"]', linha).value = q;
+    });
+    atualizaResumo(id);
     atualizaCarrinho();
-    if (!antes && qtd) mostraToast('Adicionado ao pedido.');
+  }
+
+  function defineQtd(chave, qtd) {
+    const v = variacaoPorChave.get(chave);
+    if (!v || !temPreco(v.p)) return;
+    const antes = pedido[chave] || 0;
+    const primeira = qtdDoProduto(v.p.id) === 0;
+    qtd = Math.max(0, Math.min(999, Math.floor(Number(qtd)) || 0));
+    if (qtd !== antes) {
+      if (qtd) pedido[chave] = qtd; else delete pedido[chave];
+      salva();
+    }
+    sincroniza(chave);
+    if (primeira && qtd) mostraToast('Adicionado ao pedido.');
   }
 
   /* ---------- Painel do pedido ---------- */
@@ -266,60 +363,79 @@
 
   const pecasTexto = $('#carrinho-pecas');
 
-  function itemCarrinho(id, q) {
-    const p = produtoPorId[id];
-    const unitario = p.preco;
+  // uma peça com uma linha para cada tamanho (ou cor + tamanho) pedido
+  function itemCarrinho({ p, linhas }) {
     const antigo = p.precoAntigo ? `<s>${moeda(p.precoAntigo)}</s> ` : '';
-    return `<li class="item" data-id="${id}">
-      <div class="item__midia">${midia(p, false)}</div>
-      <div class="item__info">
-        <p class="item__marca">${esc(marcaPorId[p.marca].nome)}</p>
-        <p class="item__nome">${esc(p.nome)}</p>
-        <p class="item__un">${antigo}${moeda(unitario)} / un.</p>
-        <div class="item__linha">${seletorQtd(p, q, 'qtd--mini')}<strong>${moeda(unitario * q)}</strong></div>
+    const porLinha = linhas.map(({ v, q }) => `<li class="item__var" data-v="${esc(v.chave)}">
+          <span class="item__tam">${bolinha(v.cor)}${esc(rotuloVar(v))}</span>
+          ${seletorQtd(`${rotuloVar(v)}, ${p.nome}`, q, 'qtd--mini')}
+          <strong>${moeda(p.preco * q)}</strong>
+          <button class="item__remover" type="button" data-f="remover" aria-label="Remover ${esc(p.nome)} ${esc(rotuloVar(v))} do pedido">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+          </button>
+        </li>`).join('');
+    return `<li class="item" data-id="${p.id}">
+      <div class="item__topo">
+        <div class="item__midia">${midia(p, false)}</div>
+        <div class="item__info">
+          <p class="item__marca">${esc(marcaPorId[p.marca].nome)}</p>
+          <p class="item__nome">${esc(p.nome)}</p>
+          <p class="item__un">${antigo}${moeda(p.preco)} / un.</p>
+        </div>
       </div>
-      <button class="item__remover" type="button" data-f="remover" aria-label="Remover ${esc(p.nome)} do pedido">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
-      </button>
+      <ul class="item__vars">${porLinha}</ul>
     </li>`;
   }
 
   function atualizaCarrinho() {
-    const itens = Object.entries(pedido);
+    const grupos = pedidoPorPeca();
     const un = unidades();
 
     contador.hidden = !un;
     contador.textContent = un > 99 ? '99+' : un;
     botaoCarrinho.setAttribute('aria-label', un ? `Abrir pedido (${pecas(un)})` : 'Abrir pedido');
 
-    comFoco(lista, () => { lista.innerHTML = itens.map(([id, q]) => itemCarrinho(id, q)).join(''); });
-    vazio.hidden = itens.length > 0;
+    comFoco(lista, () => { lista.innerHTML = grupos.map(itemCarrinho).join(''); });
+    vazio.hidden = grupos.length > 0;
     pecasTexto.textContent = pecas(un);
     subtotal.textContent = moeda(total());
-    finalizar.disabled = !itens.length;
-    esvaziar.hidden = !itens.length;
+    finalizar.disabled = !grupos.length;
+    esvaziar.hidden = !grupos.length;
+  }
+
+  // texto de uma peça no pedido: tamanhos (por cor, quando há) e quanto fica
+  function textoPeca({ p, linhas }) {
+    const porCor = new Map();
+    for (const { v, q } of linhas) {
+      if (!porCor.has(v.cor)) porCor.set(v.cor, []);
+      porCor.get(v.cor).push(`${v.tam} x${q}`);
+    }
+    const un = linhas.reduce((s, l) => s + l.q, 0);
+    // o nome da coleção só entra se o nome da peça ainda não trouxer (ex.: "Calça Flare Signature")
+    const colecao = marcaPorId[p.marca].nome;
+    return [
+      `• ${normaliza(p.nome).includes(normaliza(colecao)) ? '' : `${colecao} `}${p.nome}`,
+      ...[...porCor].map(([cor, tams]) => `   ${cor ? `${cor}: ` : 'Tamanhos: '}${tams.join(' · ')}`),
+      `   ${un} un. x ${moeda(p.preco)} = *${moeda(p.preco * un)}*`,
+    ].join('\n');
   }
 
   finalizar.addEventListener('click', () => {
-    const itens = Object.entries(pedido);
-    if (!itens.length) return;
-    const linhas = itens.map(([id, q]) => {
-      const p = produtoPorId[id];
-      return `• ${q}x ${marcaPorId[p.marca].nome} ${p.nome}\n   ${moeda(p.preco)} un. = *${moeda(p.preco * q)}*`;
-    });
+    const grupos = pedidoPorPeca();
+    if (!grupos.length) return;
     const obs = (campoObs ? campoObs.value : '').trim();
     // pedido em texto (o *negrito* é formatação do WhatsApp)
     const mensagem = [
       '*Pedido — Cherry Fitwear*',
       'Olá! Montei meu pedido no site e quero finalizar:',
       '',
-      ...linhas,
+      ...grupos.map(textoPeca),
       '',
       `Peças: *${unidades()}*`,
       `*Total: ${moeda(total())}*`,
-      ...(obs ? ['', '*Tamanhos e cores:*', obs] : []),
+      ...(obs ? ['', '*Observações:*', obs] : []),
       '',
-      'Aguardo a confirmação da disponibilidade (tamanhos e cores) para combinarmos o pagamento e a entrega.',
+      'Aguardo a confirmação da disponibilidade para combinarmos o pagamento e a entrega.',
     ].join('\n');
     if (!whatsapp) {
       console.warn('Cherry Fitwear: defina CHERRY_CONFIG.whatsapp em js/produtos.js (ou no painel) para receber os pedidos.');
@@ -331,10 +447,10 @@
 
   esvaziar.addEventListener('click', () => {
     if (!window.confirm('Remover todas as peças do pedido?')) return;
-    const ids = Object.keys(pedido);
+    const chaves = Object.keys(pedido);
     pedido = {};
     salva();
-    ids.forEach(atualizaAcoes);
+    chaves.forEach(sincroniza);
     atualizaCarrinho();
     $('[data-foco]', $('#carrinho'))?.focus();
   });
@@ -342,21 +458,28 @@
   // cliques e digitação em qualquer seletor de quantidade (cards, detalhes e pedido)
   document.addEventListener('click', (e) => {
     const alvo = e.target.closest('[data-f]');
-    const id = alvo?.closest('[data-id]')?.dataset.id;
-    if (!id || !produtoPorId[id]) return;
-    const q = pedido[id] || 0;
-    switch (alvo.dataset.f) {
-      case 'add': defineQtd(id, 1); break;
-      case 'mais': defineQtd(id, q + 1); break;
-      case 'menos': defineQtd(id, q - 1); break;
-      case 'remover': defineQtd(id, 0); break;
+    if (!alvo) return;
+    const f = alvo.dataset.f;
+    if (f === 'escolher') {   // botão do card: abre a peça para escolher tamanho e quantidades
+      const id = alvo.closest('[data-id]')?.dataset.id;
+      if (produtoPorId[id]) abreDetalhe(id, alvo);
+      return;
+    }
+    if (f === 'ver-pedido') { window.CherryPaineis.abrir('carrinho', alvo); return; }
+    const chave = alvo.closest('[data-v]')?.dataset.v;
+    if (!variacaoPorChave.has(chave)) return;
+    const q = pedido[chave] || 0;
+    switch (f) {
+      case 'mais': defineQtd(chave, q + 1); break;
+      case 'menos': defineQtd(chave, q - 1); break;
+      case 'remover': defineQtd(chave, 0); break;
       default:
     }
   });
   document.addEventListener('change', (e) => {
     if (e.target.dataset?.f !== 'qtd') return;
-    const id = e.target.closest('[data-id]')?.dataset.id;
-    if (id) defineQtd(id, e.target.value);
+    const chave = e.target.closest('[data-v]')?.dataset.v;
+    if (variacaoPorChave.has(chave)) defineQtd(chave, e.target.value);
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && e.target.dataset?.f === 'qtd') e.target.blur();
@@ -404,10 +527,11 @@
         <p class="detalhe__tipo">${esc(p.tipo)}</p>
         <div class="detalhe__compra">
           ${preco(p)}
-          <div class="produto__acao" data-id="${p.id}">${acao(p)}</div>
+          ${blocoVariacoes(p)}
         </div>
         <div class="detalhe__texto">${textoDetalhe(DESCRICOES[p.id])}</div>
       </div>`;
+    atualizaResumo(p.id);
     conteudoDetalhe.scrollTop = 0;
     window.CherryPaineis.abrir('detalhe', gatilho);
     history.replaceState(null, '', `#produto=${id}`);

@@ -16,7 +16,7 @@
     // Se algo falhar ao carregar (navegador antigo, internet ruim…), mostra um aviso em vez de deixar a tela parada.
     (function () {
       var mostrou = false;
-      function aviso(msg) {
+      function aviso(msg) {   o q
         if (mostrou) return;
         mostrou = true;
         var d = document.createElement('div');
@@ -277,6 +277,18 @@
           <input id="dp-selo" name="selo" type="text" autocomplete="off" maxlength="20" placeholder="Ex.: Lançamento">
           <p class="campo__ajuda">Em produtos em promoção, o site mostra a porcentagem de desconto no lugar da etiqueta.</p>
         </div>
+
+        <div class="par">
+          <div class="campo">
+            <label for="dp-tamanhos">Tamanhos <small>(separe por vírgula)</small></label>
+            <input id="dp-tamanhos" name="tamanhos" type="text" autocomplete="off" placeholder="Vazio = tamanhos padrão da loja">
+          </div>
+          <div class="campo">
+            <label for="dp-cores">Cores <small>(opcional)</small></label>
+            <input id="dp-cores" name="cores" type="text" autocomplete="off" placeholder="Ex.: Preto, Vinho, Rosa">
+          </div>
+        </div>
+        <p class="campo__ajuda">No site, o cliente escolhe a quantidade de cada tamanho (e de cada cor, se você listar cores). Se a peça tem uma cor só, deixe “Cores” vazio.</p>
 
         <details class="recolhe" id="dp-desc-det">
           <summary>Descrição completa <small>(aparece em “Ver detalhes”)</small></summary>

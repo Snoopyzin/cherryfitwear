@@ -880,12 +880,12 @@ a.produto__midia { cursor: pointer; }
 
 .carrinho__lista { flex: 1; overflow-y: auto; padding: 6px 22px; }
 .item {
-  display: grid; grid-template-columns: 68px minmax(0, 1fr) 32px; gap: 12px;
+  display: grid; gap: 10px;
   padding: 14px 0;
   border-bottom: 1px solid rgba(122, 20, 38, .08);
 }
 .item__midia {
-  width: 68px; height: 68px;
+  width: 56px; height: 56px;
   border-radius: 12px;
   background: radial-gradient(circle at 50% 42%, #fff 0, #fdf1f2 55%, #fae3e6 100%);
   overflow: hidden;
@@ -901,8 +901,17 @@ a.produto__midia { cursor: pointer; }
   font-size: .82rem; font-weight: 600; line-height: 1.3; color: var(--cereja-escura);
 }
 .item__un { margin: 0; font-size: .72rem; color: rgba(74, 10, 22, .62); }
-.item__linha { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 8px; }
-.item__linha strong { font-size: .92rem; color: var(--cereja); white-space: nowrap; }
+.item__topo { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 12px; align-items: center; }
+.item__vars { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.item__var {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto auto 28px; align-items: center; gap: 8px;
+  padding: 5px 2px 5px 12px;
+  border-radius: 14px; background: var(--blush);
+}
+.item__tam { display: flex; align-items: center; gap: 7px; min-width: 0; font-size: .82rem; font-weight: 700; color: var(--cereja-escura); }
+.item__var strong { font-size: .86rem; color: var(--cereja); white-space: nowrap; }
+.item__var .qtd { background: var(--branco); }
+.item__var .item__remover { width: 28px; height: 28px; }
 .qtd--mini { grid-template-columns: 34px 44px 34px; min-height: 36px; }
 .qtd--mini button { height: 36px; font-size: 1.1rem; }
 .qtd--mini input { font-size: .9rem; }
@@ -1313,4 +1322,54 @@ html { scroll-padding-top: calc(var(--topo-h) + 8px); }
 .js .revela.visto { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) {
   .js .revela { opacity: 1; transform: none; transition: none; }
+}
+
+/* =========================================================
+   ESCOLHA DE TAMANHO E COR (página da peça)
+   ========================================================= */
+
+.produto .btn-add { padding: 0 10px; font-size: .68rem; letter-spacing: .07em; line-height: 1.25; }
+.btn-add--no-pedido {
+  background: var(--blush); color: var(--cereja);
+  box-shadow: inset 0 0 0 1.5px rgba(122, 10, 42, .35);
+}
+.btn-add--no-pedido:hover { background: var(--rosa-claro); }
+
+.variacoes { display: grid; gap: 10px; margin-top: 6px; padding-top: 16px; border-top: 1px solid rgba(122, 10, 42, .14); }
+.variacoes__titulo { margin: 0; text-align: center; font: 800 1.05rem var(--sans); letter-spacing: -.01em; text-transform: none; color: var(--cereja-escura); }
+.variacoes__ajuda { margin: -4px 0 2px; text-align: center; font-size: .8rem; color: rgba(74, 10, 22, .68); }
+.variacoes__lista { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+
+.var {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) 120px; align-items: center; gap: 10px;
+  padding: 8px 8px 8px 10px;
+  border-radius: 18px; background: var(--branco);
+  box-shadow: inset 0 0 0 1.5px rgba(122, 10, 42, .1);
+  transition: box-shadow .2s, background-color .2s;
+}
+.var--ativa { background: #fff7fa; box-shadow: inset 0 0 0 2px var(--coral); }
+.var__tam {
+  display: grid; place-items: center;
+  min-width: 42px; height: 42px; padding: 0 9px;
+  border-radius: 13px; background: var(--cereja); color: var(--branco);
+  font-size: .95rem; font-weight: 800; letter-spacing: .02em;
+}
+.var--ativa .var__tam { background: var(--coral); }
+.var__nome { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: .92rem; font-weight: 600; line-height: 1.25; color: var(--cereja-escura); }
+.var__cor {
+  flex: none; display: inline-block; width: 16px; height: 16px;
+  border-radius: 50%; background: var(--c, #ccc);
+  box-shadow: inset 0 0 0 1.5px rgba(0, 0, 0, .2);
+}
+.detalhe__compra .var .qtd { grid-template-columns: 36px minmax(0, 1fr) 36px; min-height: 42px; background: var(--blush); }
+.detalhe__compra .var .qtd button { height: 42px; }
+.detalhe__compra .var .qtd input { font-size: .98rem; }
+
+.variacoes__resumo { margin: 2px 0 0; text-align: center; font-size: .86rem; font-weight: 700; color: var(--cereja); }
+.variacoes__ver { width: 100%; }
+.variacoes__ver[hidden] { display: none; }
+
+@media (max-width: 359px) {
+  .var { grid-template-columns: auto minmax(0, 1fr); }
+  .var .qtd { grid-column: 1 / -1; }
 }

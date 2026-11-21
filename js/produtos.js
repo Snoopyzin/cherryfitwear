@@ -9,6 +9,8 @@
    selo         opcional — etiqueta no card (ex.: 'Lançamento')
    marca        id da COLEÇÃO (Signature, Essential, Seamless…), veja a lista abaixo
    categoria    'leggings' (leggings e calças), 'tops', 'shorts', 'conjuntos' ou 'jaquetas'
+   tamanhos     opcional — tamanhos desta peça, ex.: ['P', 'M', 'G']. Sem isso vale a lista "tamanhos" da loja (CHERRY_CONFIG).
+   cores        opcional — cores da peça, ex.: ['Preto', 'Vinho']. Com cores, o cliente escolhe a quantidade de cada cor + tamanho.
    imagem       caminho da foto. Deixe '' para usar a ilustração automática da peça.
    arte         ilustração usada enquanto não há foto:
                 forma = legging | flare | biker | shorts | top | regata | macacao | conjunto | conjunto-flare | jaqueta
@@ -18,6 +20,8 @@
 window.CHERRY_CONFIG = {
   // Número que recebe os pedidos e as consultas, só dígitos com DDI + DDD (ex.: '5562999998888').
   whatsapp: '',
+  // Tamanhos que o cliente pode escolher em cada peça (cada peça pode ter a sua própria lista em "tamanhos")
+  tamanhos: ['P', 'M', 'G', 'GG'],
   // Mensagem que já vem escrita quando o cliente toca no botão "WhatsApp" do início da página
   mensagemConsulta: 'Olá! Gostaria de saber mais sobre as peças da Cherry Fitwear.',
   // Desconto para quem seguir os perfis do Instagram abaixo (0 = esconde o aviso da página inicial)
@@ -130,8 +134,8 @@ window.CHERRY_PRODUTOS = [
     arte: { forma: 'shorts', corpo: '#a50f32', tampa: '#7a0a2a', texto: '#fde0e8' } },
 
   { id: 'move-shorts-running', marca: 'move', categoria: 'shorts',
-    nome: 'Shorts Move Running Leve', tipo: 'Shorts de corrida · P ao GG',
-    preco: 55, precoAntigo: 69, imagem: '',
+    nome: 'Shorts Move Running Leve', tipo: 'Shorts de corrida · P ao G',
+    preco: 55, precoAntigo: 69, imagem: '', tamanhos: ['P', 'M', 'G'],
     arte: { forma: 'shorts', corpo: '#9a9186', tampa: '#7d7468', texto: '#e0709a' } },
 
   /* ============ CONJUNTOS E MACACÕES ============ */

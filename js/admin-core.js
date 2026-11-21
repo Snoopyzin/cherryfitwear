@@ -189,10 +189,11 @@
     const l1 = ['id', 'marca', 'categoria'].filter(tem).map(par);
     const l2 = ['nome', 'tipo', 'selo', 'destaque'].filter(tem).map(par);
     const l3 = ['preco', 'precoAntigo', 'imagem'].filter(tem).map(par);
+    const lv = ['tamanhos', 'cores'].filter(tem).map(par);
     const lg = ['galeria'].filter(tem).map(par);
     const l4 = ['arte'].filter(tem).map(par);
     const resto = Object.keys(p).filter((k) => !usados.has(k) && tem(k)).map(par);
-    const linhas = [l1, l2, [...l3, ...resto], lg, l4].filter((l) => l.length).map((l) => l.join(', '));
+    const linhas = [l1, l2, [...l3, ...resto], lv, lg, l4].filter((l) => l.length).map((l) => l.join(', '));
     return `  { ${linhas.join(',\n    ')} },`.split('\n');
   }
 
@@ -435,6 +436,9 @@
       if (!String(p.nome || '').trim()) erros.push({ id: p.id, texto: `Há um produto sem nome (${p.id})` });
       if (!marcas.has(p.marca)) erros.push({ id: p.id, texto: `“${nome}” está sem uma coleção válida` });
       if (p.galeria !== undefined && !(Array.isArray(p.galeria) && p.galeria.every((f) => typeof f === 'string' && f))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de fotos num formato inválido` });
+      for (const k of ['tamanhos', 'cores']) {
+        if (p[k] !== undefined && !(Array.isArray(p[k]) && p[k].length <= 20 && p[k].every((x) => typeof x === 'string' && x.trim()))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de ${k} num formato inválido` });
+      }
       if (!['leggings', 'tops', 'shorts', 'conjuntos', 'jaquetas'].includes(p.categoria)) erros.push({ id: p.id, texto: `“${nome}” está sem categoria` });
       for (const k of ['preco', 'precoAntigo']) {
         const v = p[k];
@@ -445,6 +449,7 @@
       }
     }
     const c = d.config;
+    if (c.tamanhos !== undefined && !(Array.isArray(c.tamanhos) && c.tamanhos.length && c.tamanhos.every((x) => typeof x === 'string' && x.trim()))) erros.push({ texto: 'A lista de tamanhos da loja precisa ter ao menos um tamanho.' });
     if (!/^\d{12,13}$/.test(String(c.whatsapp || ''))) erros.push({ texto: 'O WhatsApp precisa ter DDI + DDD + número (ex.: 5562999998888).' });
     if (c.descontoSeguir !== undefined) {
       if (!Number.isInteger(c.descontoSeguir) || c.descontoSeguir < 0 || c.descontoSeguir > 100) erros.push({ texto: 'O desconto por seguir no Instagram precisa estar entre 0% e 100%.' });
@@ -469,6 +474,16 @@
     return { erros, avisos };
   }
 
+  // "P, M, G" → ['P', 'M', 'G'] (sem repetidos, sem "|", no máximo 20 itens de até 24 letras)
+  function lerLista(texto) {
+    const lista = [];
+    for (const parte of String(texto || '').split(/[,;\n]+/)) {
+      const t = parte.replace(/\|/g, '/').replace(/\s+/g, ' ').trim().slice(0, 24);
+      if (t && !lista.some((x) => x.toLowerCase() === t.toLowerCase())) lista.push(t);
+    }
+    return lista.slice(0, 20);
+  }
+
   // "@perfil, https://www.instagram.com/outro_perfil/" → ['perfil', 'outro_perfil']
   function lerPerfis(texto) {
     const lista = [];
@@ -482,7 +497,7 @@
   const api = {
     clonar, iguais, semAcento, slug, idUnico, lerReais, formatarReais, moedaBR,
     avaliar, calcularCambios, idsTocados, totalCambios, aplicarCambios, gerarTextos, validar,
-    listaParaTexto, textoParaLista, paragrafosParaTexto, textoParaParagrafos, ativosParaTexto, textoParaAtivos, montarDescricao, lerPerfis,
+    listaParaTexto, textoParaLista, paragrafosParaTexto, textoParaParagrafos, ativosParaTexto, textoParaAtivos, montarDescricao, lerPerfis, lerLista,
     _interno: { blocoProduto, blocoDescricao, linhaMarca, remendaProdutos, remendaDescricoes, regeneraProdutos, regeneraDescricoes, valorInline },
   };
   raiz.CherryAdminCore = api;
