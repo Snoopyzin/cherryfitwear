@@ -419,6 +419,18 @@
 
   /* ---------- Conferência antes de publicar ---------- */
 
+  // mesma lista de categorias do site (js/loja.js) e do painel (admin.html)
+  const CATEGORIAS = ['leggings', 'tops', 'blusas', 'shorts', 'macacao', 'conjunto-calca', 'conjunto-short', 'jaquetas', 'masculino', 'acessorios'];
+
+  // "Menta P, M, G" → { nome: 'Menta', tamanhos: ['P', 'M', 'G'] }; sem tamanhos no nome → tamanhos vazios
+  // (mesma regra do site, em js/loja.js)
+  const TAM_COR = '(?:XXG|XG|EGG|EG|GG|G[123]|PP|P|M|G)';
+  const COR_COM_TAMANHOS = new RegExp(`^(.+?)\\s+(${TAM_COR}(?:\\s*[,/]\\s*${TAM_COR})*)$`, 'i');
+  function separaTamanhosDaCor(texto) {
+    const m = String(texto || '').trim().match(COR_COM_TAMANHOS);
+    return m ? { nome: m[1].trim(), tamanhos: m[2].split(/\s*[,/]\s*/).map((t) => t.toUpperCase()) } : { nome: String(texto || '').trim(), tamanhos: [] };
+  }
+
   function validar(d) {
     const erros = [];
     const avisos = [];
@@ -439,9 +451,15 @@
       if (p.tamanhos !== undefined && !(Array.isArray(p.tamanhos) && p.tamanhos.length <= 20 && p.tamanhos.every((x) => typeof x === 'string' && x.trim()))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de tamanhos num formato inválido` });
       // cor = só o nome ('Preto') ou { nome, cor: '#rrggbb', imagem: 'images/produtos/…' }
       const corOk = (x) => (typeof x === 'string' && x.trim())
-        || (x && typeof x === 'object' && typeof x.nome === 'string' && x.nome.trim() && (x.cor === undefined || /^#[0-9a-f]{6}$/i.test(x.cor)) && (x.imagem === undefined || typeof x.imagem === 'string'));
+        || (x && typeof x === 'object' && typeof x.nome === 'string' && x.nome.trim() && (x.cor === undefined || /^#[0-9a-f]{6}$/i.test(x.cor)) && (x.imagem === undefined || typeof x.imagem === 'string')
+          && (x.tamanhos === undefined || (Array.isArray(x.tamanhos) && x.tamanhos.length <= 20 && x.tamanhos.every((t) => typeof t === 'string' && t.trim()))));
       if (p.cores !== undefined && !(Array.isArray(p.cores) && p.cores.length <= 20 && p.cores.every(corOk))) erros.push({ id: p.id, texto: `“${nome}” tem a lista de cores num formato inválido` });
-      if (!['leggings', 'tops', 'shorts', 'conjuntos', 'jaquetas'].includes(p.categoria)) erros.push({ id: p.id, texto: `“${nome}” está sem categoria` });
+      if (p.categoria === 'conjuntos') {
+        // categoria antiga: não bloqueia a publicação, mas a peça só aparece em "Todos" até ganhar uma nova
+        avisos.push({ id: p.id, texto: `“${nome}” ainda está na categoria antiga “Conjuntos”. Escolha Conjunto calça, Conjunto short ou Macacão (até lá ela só aparece em “Todos”).` });
+      } else if (!CATEGORIAS.includes(p.categoria)) {
+        erros.push({ id: p.id, texto: `“${nome}” está sem categoria` });
+      }
       for (const k of ['preco', 'precoAntigo']) {
         const v = p[k];
         if (v !== undefined && v !== null && !(typeof v === 'number' && Number.isFinite(v) && v >= 0)) erros.push({ id: p.id, texto: `“${nome}” tem um preço inválido` });
@@ -499,7 +517,7 @@
   const api = {
     clonar, iguais, semAcento, slug, idUnico, lerReais, formatarReais, moedaBR,
     avaliar, calcularCambios, idsTocados, totalCambios, aplicarCambios, gerarTextos, validar,
-    listaParaTexto, textoParaLista, paragrafosParaTexto, textoParaParagrafos, ativosParaTexto, textoParaAtivos, montarDescricao, lerPerfis, lerLista,
+    listaParaTexto, textoParaLista, paragrafosParaTexto, textoParaParagrafos, ativosParaTexto, textoParaAtivos, montarDescricao, lerPerfis, lerLista, separaTamanhosDaCor, CATEGORIAS,
     _interno: { blocoProduto, blocoDescricao, linhaMarca, remendaProdutos, remendaDescricoes, regeneraProdutos, regeneraDescricoes, valorInline },
   };
   raiz.CherryAdminCore = api;

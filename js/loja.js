@@ -40,22 +40,33 @@
     azul: '#3b6fb6', 'azul marinho': '#1d2b53', verde: '#3f8f6b', menta: '#a8dcc8', lilas: '#b69ad8', roxo: '#6b3fa0',
     amarelo: '#f2c744', laranja: '#f08a3c',
   };
-  // cores da peça: { nome, cor (#hex), imagem (foto desta cor) }. Aceita também só o nome ('Preto').
+  // nomes de cor com os tamanhos escritos junto ("Menta P, M, G", "Marrom G") viram nome + tamanhos da cor
+  // (mesma regra do painel, em js/admin-core.js: separaTamanhosDaCor)
+  const TAM_COR = '(?:XXG|XG|EGG|EG|GG|G[123]|PP|P|M|G)';
+  const COR_COM_TAMANHOS = new RegExp(`^(.+?)\\s+(${TAM_COR}(?:\\s*[,/]\\s*${TAM_COR})*)$`, 'i');
+  function separaTamanhosDaCor(texto) {
+    const m = String(texto || '').trim().match(COR_COM_TAMANHOS);
+    return m ? { nome: m[1].trim(), tamanhos: m[2].split(/\s*[,/]\s*/).map((t) => t.toUpperCase()) } : { nome: String(texto || '').trim(), tamanhos: [] };
+  }
+  // cores da peça: { nome, hex, imagem (foto desta cor), tamanhos (só os desta cor; vazio = os da peça) }.
+  // Aceita também só o nome ('Preto').
   const coresDe = (p) => {
     const vistos = new Set();
     return (Array.isArray(p.cores) ? p.cores : [])
       .map((c) => (typeof c === 'string' ? { nome: c } : (c || {})))
       .map((c) => {
-        const nome = String(c.nome || '').trim().replace(/\|/g, '/');
+        const sep = separaTamanhosDaCor(String(c.nome || '').replace(/\|/g, '/'));
+        const proprios = limpaLista(c.tamanhos);
+        const nome = sep.nome;
         const hex = /^#[0-9a-f]{6}$/i.test(c.cor || '') ? c.cor : (CORES_HEX[normaliza(nome)] || '');
-        return { nome, hex, imagem: c.imagem || '' };
+        return { nome, hex, imagem: c.imagem || '', tamanhos: proprios.length ? proprios : sep.tamanhos };
       })
       .filter((c) => c.nome && !vistos.has(c.nome.toLowerCase()) && vistos.add(c.nome.toLowerCase()));
   };
   // cada combinação cor + tamanho que o cliente pode pedir; a chave "codigo|cor|tamanho" identifica a linha no pedido
   const variacoes = (p) => {
     const cores = coresDe(p);
-    return (cores.length ? cores : [null]).flatMap((c) => tamanhosDe(p).map((tam) => ({ p, cor: c ? c.nome : '', corInfo: c, tam, chave: `${p.id}|${c ? c.nome : ''}|${tam}` })));
+    return (cores.length ? cores : [null]).flatMap((c) => (c && c.tamanhos.length ? c.tamanhos : tamanhosDe(p)).map((tam) => ({ p, cor: c ? c.nome : '', corInfo: c, tam, chave: `${p.id}|${c ? c.nome : ''}|${tam}` })));
   };
   const variacaoPorChave = new Map(PRODUTOS.flatMap((p) => variacoes(p).map((v) => [v.chave, v])));
   const rotuloVar = (v) => (v.cor ? `${v.cor} · ${v.tam}` : v.tam);
@@ -633,11 +644,36 @@
     return desconto > 0 ? `-${desconto}%` : (p.selo || '');
   };
 
+  // categorias da loja: [código, nome, nome curto (menu do topo)]. O código é o "categoria" de cada peça;
+  // o painel (admin.html e js/admin-core.js) usa esta mesma lista. Só aparecem na loja as que já têm peças.
+  const CATEGORIAS = [
+    ['leggings', 'Leggings e calças', 'Leggings'],
+    ['tops', 'Tops'],
+    ['blusas', 'Blusas'],
+    ['shorts', 'Shorts'],
+    ['macacao', 'Macacão'],
+    ['conjunto-calca', 'Conjunto calça'],
+    ['conjunto-short', 'Conjunto short'],
+    ['jaquetas', 'Jaquetas'],
+    ['masculino', 'Masculino'],
+    ['acessorios', 'Acessórios'],
+  ];
+  const categoriasComPecas = CATEGORIAS.filter(([id]) => PRODUTOS.some((p) => p.categoria === id));
+
+  // links de categoria do menu, do menu do celular e do rodapé, e os botões de filtro do catálogo
+  $$('[data-nav-categorias]').forEach((ul) => {
+    const max = Number(ul.dataset.navCategorias) || categoriasComPecas.length;
+    ul.insertAdjacentHTML('afterbegin', categoriasComPecas.slice(0, max).map(([id, nome, curto]) => `<li><a href="#catalogo" data-categoria="${id}">${esc(ul.hasAttribute('data-nav-curto') && curto ? curto : nome)}</a></li>`).join(''));
+  });
+  const grupoFiltros = $('.filtros__grupo');
+  if (grupoFiltros) grupoFiltros.insertAdjacentHTML('beforeend', categoriasComPecas.map(([id, nome]) => `<button class="chip" type="button" data-categoria="${id}" aria-pressed="false">${esc(nome)}</button>`).join(''));
+
   // 3 peças em destaque no topo: a primeira com preço de cada categoria, completando com as demais se faltar
   const vitrine = $('#hero-vitrine');
   if (vitrine) {
     const destaques = [];
-    for (const cat of ['leggings', 'tops', 'conjuntos']) {
+    for (const [cat] of CATEGORIAS) {
+      if (destaques.length >= 3) break;
       const p = PRODUTOS.find((x) => x.categoria === cat && temPreco(x));
       if (p) destaques.push(p);
     }
@@ -654,7 +690,6 @@
     }).join('');
   }
 
-  const CATEGORIAS = [['leggings', 'Leggings e calças'], ['tops', 'Tops e regatas'], ['shorts', 'Shorts e bikers'], ['conjuntos', 'Conjuntos e macacões'], ['jaquetas', 'Jaquetas']];
   const listaCategorias = $('#lista-categorias');
   if (listaCategorias) {
     listaCategorias.innerHTML = CATEGORIAS.map(([id, nome]) => {

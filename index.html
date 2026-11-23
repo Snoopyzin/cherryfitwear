@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cherry Fitwear | Moda Fitness</title>
-  <meta name="description" content="Moda fitness feminina e masculina: leggings, calças, tops, shorts, conjuntos e jaquetas. Monte seu pedido no site e finalize pelo WhatsApp.">
+  <meta name="description" content="Moda fitness feminina e masculina: leggings, calças, tops, blusas, macacões, conjuntos, jaquetas e acessórios. Monte seu pedido no site e finalize pelo WhatsApp.">
   <meta name="theme-color" content="#8e0030">
   <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
   <link rel="icon" type="image/png" href="images/favicon.png">
@@ -74,10 +74,7 @@
       </a>
 
       <nav class="nav" aria-label="Principal">
-        <ul>
-          <li><a href="#catalogo" data-categoria="leggings">Leggings</a></li>
-          <li><a href="#catalogo" data-categoria="tops">Tops</a></li>
-          <li><a href="#catalogo" data-categoria="conjuntos">Conjuntos</a></li>
+        <ul data-nav-categorias="3" data-nav-curto>
           <li><a href="#marcas">Coleções</a></li>
           <li><a href="#como-comprar">Como comprar</a></li>
         </ul>
@@ -111,12 +108,7 @@
         <span class="gaveta__logo-sub">Fitwear</span>
       </div>
       <nav aria-label="Menu mobile">
-        <ul class="gaveta__links">
-          <li><a href="#catalogo" data-categoria="leggings">Leggings</a></li>
-          <li><a href="#catalogo" data-categoria="tops">Tops</a></li>
-          <li><a href="#catalogo" data-categoria="shorts">Shorts</a></li>
-          <li><a href="#catalogo" data-categoria="conjuntos">Conjuntos</a></li>
-          <li><a href="#catalogo" data-categoria="jaquetas">Jaquetas</a></li>
+        <ul class="gaveta__links" data-nav-categorias>
           <li><a href="#marcas">Coleções</a></li>
           <li><a href="#como-comprar">Como comprar</a></li>
         </ul>
@@ -210,7 +202,7 @@
             <span class="hero__sub">Fitwear</span>
           </h1>
           <p class="hero__slogan" style="--i:2">O <em>pré-treino</em> perfeito existe e <mark>está aqui!!</mark></p>
-          <p class="hero__desc" style="--i:3">Leggings, calças, tops, shorts, conjuntos e jaquetas para treinar com conforto e estilo. Monte seu pedido e finalize pelo WhatsApp.</p>
+          <p class="hero__desc" style="--i:3">Leggings, tops, blusas, macacões, conjuntos, jaquetas e acessórios para treinar com conforto e estilo. Monte seu pedido e finalize pelo WhatsApp.</p>
           <div class="hero__desconto" id="desconto" style="--i:4" hidden>
             <span class="hero__desconto-selo" aria-hidden="true"><strong data-desconto-seguir>10%</strong><small>off</small></span>
             <div class="hero__desconto-corpo">
@@ -234,8 +226,8 @@
     <div class="faixa">
       <p class="sr-only">Moda fitness feminina e masculina. Conforto em cada movimento, qualidade que te acompanha e estilo para todas as suas metas. Monte seu pedido e finalize pelo WhatsApp.</p>
       <div class="faixa__trilho" aria-hidden="true">
-        <span>Moda fitness com conforto</span><i>✦</i><span>Feminina e masculina</span><i>✦</i><span>Leggings, tops, shorts e conjuntos</span><i>✦</i><span>Conforto em cada movimento</span><i>✦</i><span>Qualidade que te acompanha</span><i>✦</i><span>Estilo para todas as suas metas</span><i>✦</i><span>Monte seu pedido e finalize pelo WhatsApp</span><i>✦</i><span>Cherry Fitwear</span><i>✦</i>
-        <span>Moda fitness com conforto</span><i>✦</i><span>Feminina e masculina</span><i>✦</i><span>Leggings, tops, shorts e conjuntos</span><i>✦</i><span>Conforto em cada movimento</span><i>✦</i><span>Qualidade que te acompanha</span><i>✦</i><span>Estilo para todas as suas metas</span><i>✦</i><span>Monte seu pedido e finalize pelo WhatsApp</span><i>✦</i><span>Cherry Fitwear</span><i>✦</i>
+        <span>Moda fitness com conforto</span><i>✦</i><span>Feminina e masculina</span><i>✦</i><span>Leggings, tops, blusas e conjuntos</span><i>✦</i><span>Conforto em cada movimento</span><i>✦</i><span>Qualidade que te acompanha</span><i>✦</i><span>Estilo para todas as suas metas</span><i>✦</i><span>Monte seu pedido e finalize pelo WhatsApp</span><i>✦</i><span>Cherry Fitwear</span><i>✦</i>
+        <span>Moda fitness com conforto</span><i>✦</i><span>Feminina e masculina</span><i>✦</i><span>Leggings, tops, blusas e conjuntos</span><i>✦</i><span>Conforto em cada movimento</span><i>✦</i><span>Qualidade que te acompanha</span><i>✦</i><span>Estilo para todas as suas metas</span><i>✦</i><span>Monte seu pedido e finalize pelo WhatsApp</span><i>✦</i><span>Cherry Fitwear</span><i>✦</i>
       </div>
     </div>
 
@@ -301,11 +293,6 @@
       <div class="filtros">
         <div class="filtros__grupo" role="group" aria-label="Categoria">
           <button class="chip" type="button" data-categoria="todos" aria-pressed="true">Todos</button>
-          <button class="chip" type="button" data-categoria="leggings" aria-pressed="false">Leggings e calças</button>
-          <button class="chip" type="button" data-categoria="tops" aria-pressed="false">Tops</button>
-          <button class="chip" type="button" data-categoria="shorts" aria-pressed="false">Shorts</button>
-          <button class="chip" type="button" data-categoria="conjuntos" aria-pressed="false">Conjuntos</button>
-          <button class="chip" type="button" data-categoria="jaquetas" aria-pressed="false">Jaquetas</button>
         </div>
         <div class="filtros__ativos" id="filtros-ativos"></div>
         <p class="filtros__contagem" id="catalogo-contagem" aria-live="polite"></p>
@@ -360,12 +347,7 @@
         <span><span class="rodape__nome">cherry</span><span class="rodape__sub">Fitwear</span></span>
       </a>
       <nav class="rodape__nav" aria-label="Rodapé">
-        <ul>
-          <li><a href="#catalogo" data-categoria="leggings">Leggings e calças</a></li>
-          <li><a href="#catalogo" data-categoria="tops">Tops</a></li>
-          <li><a href="#catalogo" data-categoria="shorts">Shorts</a></li>
-          <li><a href="#catalogo" data-categoria="conjuntos">Conjuntos</a></li>
-          <li><a href="#catalogo" data-categoria="jaquetas">Jaquetas</a></li>
+        <ul data-nav-categorias>
           <li><a href="#como-comprar">Como comprar</a></li>
         </ul>
       </nav>

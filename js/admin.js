@@ -602,22 +602,40 @@
   dp.coresPresets.innerHTML = PRESET_CORES.map(([n, h]) => `<button class="preset-cor" type="button" data-preset="${esc(n)}" style="--c:${h}"><i aria-hidden="true"></i>${esc(n)}</button>`).join('');
   const hexDe = (nome) => (PRESET_CORES.find(([n]) => norm(n) === norm(nome)) || [])[1];
 
+  // tamanhos que a peça oferece (campo "Tamanhos"; vazio = padrão da loja), mais os que alguma cor já usava ao abrir a janela
+  const TAMANHOS_PADRAO = () => (S.atual.config.tamanhos && S.atual.config.tamanhos.length ? S.atual.config.tamanhos : ['P', 'M', 'G', 'GG']);
+  function tamanhosDaPeca() {
+    const lista = Core.lerLista(dp.tamanhos.value);
+    const base = lista.length ? lista : TAMANHOS_PADRAO();
+    return [...base, ...((ed && ed.extraTam) || []).filter((t) => !base.includes(t))];
+  }
+
   // lista de cores no formulário; cada cor guarda a foto escolhida como o próprio item de ed.fotos (acompanha trocas de ordem)
+  // e os tamanhos que existem naquela cor (c.tamanhos = null significa todos os tamanhos da peça)
   function desenhaCores() {
     if (!ed || !ed.cores) return;
     for (const c of ed.cores) if (c.foto && !ed.fotos.includes(c.foto)) c.foto = null;
+    const todos = tamanhosDaPeca();
     dp.cores.innerHTML = ed.cores.length
       ? ed.cores.map((c, i) => `<div class="cor-ed" data-i="${i}">
           <input type="color" value="${esc(c.cor)}" data-campo="cor" aria-label="Cor ${esc(c.nome || i + 1)}">
           <input type="text" value="${esc(c.nome)}" maxlength="24" placeholder="Nome da cor (ex.: Menta)" data-campo="nome" aria-label="Nome da cor ${i + 1}" autocomplete="off">
-          <select data-campo="foto" aria-label="Foto da cor ${esc(c.nome || i + 1)}">
-            <option value="-1">Sem foto específica</option>
-            ${ed.fotos.map((f, j) => `<option value="${j}"${c.foto === f ? ' selected' : ''}>Foto ${j + 1}${j === 0 ? ' (principal)' : ''}</option>`).join('')}
-          </select>
           <button class="mini" type="button" data-cor-acao="remover" aria-label="Remover a cor ${esc(c.nome || i + 1)}">✕</button>
+          <label class="cor-ed__linha"><span>Foto desta cor</span>
+            <select data-campo="foto" aria-label="Foto da cor ${esc(c.nome || i + 1)}">
+              <option value="-1">Sem foto específica</option>
+              ${ed.fotos.map((f, j) => `<option value="${j}"${c.foto === f ? ' selected' : ''}>Foto ${j + 1}${j === 0 ? ' (principal)' : ''}</option>`).join('')}
+            </select>
+          </label>
+          <div class="cor-ed__linha"><span>Tamanhos desta cor</span>
+            <div class="tam-chips" role="group" aria-label="Tamanhos da cor ${esc(c.nome || i + 1)}">
+              ${todos.map((t) => `<button class="tam-chip" type="button" data-tam="${esc(t)}" aria-pressed="${!c.tamanhos || c.tamanhos.includes(t)}">${esc(t)}</button>`).join('')}
+            </div>
+          </div>
         </div>`).join('')
       : '<p class="campo__ajuda">Nenhuma cor: o site mostra só os tamanhos.</p>';
   }
+  dp.tamanhos.addEventListener('input', () => desenhaCores());
 
   dp.cores.addEventListener('input', (e) => {
     const linha = e.target.closest('.cor-ed');
@@ -636,6 +654,18 @@
     if (campo === 'nome' && !c.corManual && hexDe(e.target.value)) { c.cor = hexDe(e.target.value); $('[data-campo="cor"]', linha).value = c.cor; }
   });
   dp.cores.addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-tam]');
+    if (chip) {   // liga/desliga um tamanho nesta cor (sempre sobra pelo menos um)
+      const c = ed.cores[Number(chip.closest('.cor-ed').dataset.i)];
+      const todos = tamanhosDaPeca();
+      const atuais = new Set(c.tamanhos || todos);
+      const t = chip.dataset.tam;
+      if (atuais.has(t)) { if (atuais.size === 1) return; atuais.delete(t); } else atuais.add(t);
+      const novos = todos.filter((x) => atuais.has(x));
+      c.tamanhos = novos.length === todos.length ? null : novos;
+      chip.setAttribute('aria-pressed', String(atuais.has(t)));
+      return;
+    }
     const b = e.target.closest('[data-cor-acao="remover"]');
     if (!b) return;
     ed.cores.splice(Number(b.closest('.cor-ed').dataset.i), 1);
@@ -718,16 +748,23 @@
     ed = { novo: !existente, p, desc: existente ? Core.clonar(S.atual.descricoes[id]) || null : null, fotos: todasFotos(p).map((c) => ({ caminho: c })), fotosAntes: todasFotos(p) };
     ed.cores = (p.cores || []).map((c) => {
       const o = typeof c === 'string' ? { nome: c } : c;
-      return { nome: o.nome || '', cor: /^#[0-9a-f]{6}$/i.test(o.cor || '') ? o.cor : (hexDe(o.nome) || '#cccccc'), foto: o.imagem ? ed.fotos.find((f) => f.caminho === o.imagem) || null : null, corManual: true };
+      // nomes antigos com os tamanhos junto ("Menta P, M, G") viram nome limpo + tamanhos da cor
+      const sep = Core.separaTamanhosDaCor(o.nome);
+      const proprios = Array.isArray(o.tamanhos) && o.tamanhos.length ? o.tamanhos : sep.tamanhos;
+      return { nome: sep.nome, cor: /^#[0-9a-f]{6}$/i.test(o.cor || '') ? o.cor : (hexDe(sep.nome) || '#cccccc'), foto: o.imagem ? ed.fotos.find((f) => f.caminho === o.imagem) || null : null, tamanhos: proprios.length ? proprios : null, corManual: true };
     });
 
     $('#dp-titulo').textContent = existente ? 'Editar produto' : 'Novo produto';
     dp.nome.value = p.nome;
     dp.tipo.value = p.tipo || '';
     preencheMarcasProduto(p.marca);
-    dp.categoria.value = p.categoria;
+    // categoria antiga (ex.: "Conjuntos") não existe mais: fica em branco para a pessoa escolher a nova
+    dp.categoria.value = [...dp.categoria.options].some((o) => o.value && o.value === p.categoria) ? p.categoria : '';
     dp.selo.value = p.selo || '';
     dp.tamanhos.value = (p.tamanhos || []).join(', ');
+    // tamanhos que alguma cor já usa mas a peça não lista continuam disponíveis para marcar nas cores
+    const baseAbertura = Core.lerLista(dp.tamanhos.value).length ? Core.lerLista(dp.tamanhos.value) : TAMANHOS_PADRAO();
+    ed.extraTam = [...new Set(ed.cores.flatMap((c) => c.tamanhos || []))].filter((t) => !baseAbertura.includes(t));
     dp.preco.value = Core.formatarReais(p.preco);
     dp.antigo.value = Core.formatarReais(p.precoAntigo);
     dp.promo.checked = typeof p.precoAntigo === 'number';
@@ -798,6 +835,7 @@
     e.preventDefault();
     const nome = dp.nome.value.trim();
     if (!nome) return erroProduto('Digite o nome do produto.', dp.nome);
+    if (!dp.categoria.value) return erroProduto('Escolha a categoria da peça.', dp.categoria);
     const nomesCor = ed.cores.map((c) => norm(c.nome.trim())).filter(Boolean);
     if (new Set(nomesCor).size !== nomesCor.length) return erroProduto('Há duas cores com o mesmo nome. Deixe cada cor com um nome diferente.');
     const promoLigada = dp.promo.checked;
@@ -846,10 +884,14 @@
     p.imagem = caminhos[0] || '';
     if (caminhos.length > 1) p.galeria = caminhos.slice(1); else delete p.galeria;
     // cores: nome, tom e (se escolhida) a foto que mostra essa cor
+    const todosTam = tamanhosDaPeca();
     const cores = ed.cores.filter((c) => c.nome.trim()).map((c) => {
       const o = { nome: c.nome.trim(), cor: c.cor };
       const j = c.foto ? ed.fotos.indexOf(c.foto) : -1;
       if (j >= 0 && caminhos[j]) o.imagem = caminhos[j];
+      // só grava os tamanhos da cor quando ela não tem todos os da peça
+      const proprios = c.tamanhos ? todosTam.filter((t) => c.tamanhos.includes(t)) : [];
+      if (proprios.length && proprios.length < todosTam.length) o.tamanhos = proprios;
       return o;
     });
     if (cores.length) p.cores = cores; else delete p.cores;
