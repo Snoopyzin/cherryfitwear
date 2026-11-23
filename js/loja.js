@@ -656,6 +656,7 @@
     ['conjunto-short', 'Conjunto short'],
     ['jaquetas', 'Jaquetas'],
     ['masculino', 'Masculino'],
+    ['moda-evangelica', 'Moda Evangélica'],
     ['acessorios', 'Acessórios'],
   ];
   const categoriasComPecas = CATEGORIAS.filter(([id]) => PRODUTOS.some((p) => p.categoria === id));

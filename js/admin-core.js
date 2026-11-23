@@ -420,7 +420,7 @@
   /* ---------- Conferência antes de publicar ---------- */
 
   // mesma lista de categorias do site (js/loja.js) e do painel (admin.html)
-  const CATEGORIAS = ['leggings', 'tops', 'blusas', 'shorts', 'macacao', 'conjunto-calca', 'conjunto-short', 'jaquetas', 'masculino', 'acessorios'];
+  const CATEGORIAS = ['leggings', 'tops', 'blusas', 'shorts', 'macacao', 'conjunto-calca', 'conjunto-short', 'jaquetas', 'masculino', 'moda-evangelica', 'acessorios'];
 
   // "Menta P, M, G" → { nome: 'Menta', tamanhos: ['P', 'M', 'G'] }; sem tamanhos no nome → tamanhos vazios
   // (mesma regra do site, em js/loja.js)
