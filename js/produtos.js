@@ -36,12 +36,7 @@ window.CHERRY_CONFIG = {
 };
 
 window.CHERRY_MARCAS = [
-  { id: 'signature',   nome: 'Signature',   logo: 'CF',          estilo: 'serif',     cor: '#ffffff', fundo: '#7a0a2a', sub: 'Linha CF' },
-  { id: 'essential',   nome: 'Essential',   logo: 'essential',   estilo: 'sans-leve', cor: '#470418', sub: 'Básicas' },
-  { id: 'seamless',    nome: 'Seamless',    logo: 'SEAMLESS',    estilo: 'espacado',  cor: '#7a0a2a', sub: 'Sem costura' },
-  { id: 'power-lift',  nome: 'Power Lift',  logo: 'Power Lift',  estilo: 'sans',      cor: '#470418', fundo: '#f6b3c4', sub: 'Compressão' },
-  { id: 'cherry-glow', nome: 'Cherry Glow', logo: 'Cherry Glow', estilo: 'script',    cor: '#cf2a5c', sub: 'Tons de cereja' },
-  { id: 'move',        nome: 'Move',        logo: 'MOVE',        estilo: 'espacado',  cor: '#ffffff', fundo: '#1a1416', sub: 'Corrida e treino' },
+  { id: 'power-lift', nome: 'Cherry Bloom Collection', logo: 'Cherry Bloom Collection', estilo: 'sans', cor: '#470418', fundo: '#f6b3c4', sub: 'Compressão' },
 ];
 
 const FOTO = (id) => `images/produtos/${id}.webp`;
