@@ -36,7 +36,7 @@ window.CHERRY_CONFIG = {
 };
 
 window.CHERRY_MARCAS = [
-  { id: 'power-lift', nome: 'Cherry Bloom Collection', logo: 'Cherry Bloom Collection', estilo: 'sans', cor: '#470418', fundo: '#f6b3c4', sub: 'Compressão' },
+  { id: 'power-lift', nome: 'Bloom Collection', logo: 'Bloom Collection', estilo: 'sans', cor: '#470418', fundo: '#f6b3c4', sub: 'Compressão' },
 ];
 
 const FOTO = (id) => `images/produtos/${id}.webp`;
