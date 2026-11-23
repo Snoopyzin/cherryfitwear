@@ -52,4 +52,48 @@ window.CHERRY_PRODUTOS = [
 
   /* ============ JAQUETAS ============ */
 
+  { id: 'power-lift-macaquinho-nicoly', marca: 'power-lift', categoria: 'leggings',
+    nome: 'Macaquinho Nicoly', tipo: 'Macaquinho sem Costura de Mangas c/ Reguladores nas Costas MENTA',
+    preco: 153.5, imagem: 'images/produtos/power-lift-macaquinho-nicoly.jpg',
+    cores: [{ nome: 'Menta P, M, G', cor: '#a8dcc8' }, { nome: 'Verde Oliva P, M, G', cor: '#3f8f6b' }, { nome: 'Marrom G', cor: '#6b4a3a' }, { nome: 'Off Perola G', cor: '#f4efe6' }],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-conjunto-vitoria', marca: 'power-lift', categoria: 'conjuntos',
+    nome: 'Conjunto Vitória', tipo: 'Conjunto Beach Tênis Short Duplo',
+    preco: 129.99, imagem: 'images/produtos/power-lift-conjunto-vitoria.jpg',
+    cores: [{ nome: 'Turquesa M, G', cor: '#00a3b7' }],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-conjunto-pandora', marca: 'power-lift', categoria: 'conjuntos',
+    nome: 'Conjunto Pandora', tipo: 'Conjunto Comfort Top e Calça Pantalona',
+    preco: 139.99, imagem: 'images/produtos/power-lift-conjunto-pandora.jpg',
+    cores: [{ nome: 'Preto G', cor: '#000000' }, { nome: 'Terracota P, M, G', cor: '#cccccc', imagem: 'images/produtos/power-lift-conjunto-pandora-mwtdwcky3.jpg' }, { nome: 'Nude Rosado P, M, G', cor: '#d9b8a3' }, { nome: 'Marrom P, G', cor: '#6b4a3a' }, { nome: 'Azul Perolado P, M, G', cor: '#3b6fb6' }],
+    galeria: ['images/produtos/power-lift-conjunto-pandora-mwtdwcky1.jpg', 'images/produtos/power-lift-conjunto-pandora-mwtdwcky2.jpg', 'images/produtos/power-lift-conjunto-pandora-mwtdwcky3.jpg', 'images/produtos/power-lift-conjunto-pandora-mwtdwcky4.jpg'],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-conjunto-analu', marca: 'power-lift', categoria: 'conjuntos',
+    nome: 'Conjunto Analu', tipo: 'Conjunto Flare Sem Costura',
+    preco: 159.99, imagem: 'images/produtos/power-lift-conjunto-analu.jpg',
+    cores: [{ nome: 'Cinza Aço P, M, G', cor: '#8a8587' }],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-macacao-joyce', marca: 'power-lift', categoria: 'leggings',
+    nome: 'Macacão Joyce', tipo: 'Macacão Tomara Que Cai sem Costura',
+    preco: 189.5, imagem: 'images/produtos/power-lift-macacao-joyce.jpg',
+    cores: [{ nome: 'Verde Oliva P', cor: '#3f8f6b' }, { nome: 'Menta P, M', cor: '#a8dcc8' }, { nome: 'Off Perola M', cor: '#f4efe6' }],
+    galeria: ['images/produtos/power-lift-macacao-joyce-mwte6w7u1.jpg'],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-blusa-deusa', marca: 'power-lift', categoria: 'jaquetas',
+    nome: 'Blusa Deusa', tipo: 'Blusa Traspassada Comfort',
+    preco: 110, imagem: 'images/produtos/power-lift-blusa-deusa.jpg',
+    cores: [{ nome: 'Preto P, M, G', cor: '#1a1416' }, { nome: 'Nude Rosado P, M, G', cor: '#d9b8a3' }, { nome: 'Marrom FUDGE P, M, G', cor: '#6b4a3a' }, { nome: 'TERRACOTA P, M, G', cor: '#d8c3a5', imagem: 'images/produtos/power-lift-blusa-deusa-mwtecwse2.jpg' }, { nome: 'AZUL PETRÓLEO P, M, G', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-blusa-deusa-mwtecwse3.jpg' }],
+    galeria: ['images/produtos/power-lift-blusa-deusa-mwtecwse1.jpg', 'images/produtos/power-lift-blusa-deusa-mwtecwse2.jpg', 'images/produtos/power-lift-blusa-deusa-mwtecwse3.jpg'],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-conjunto-mari', marca: 'power-lift', categoria: 'leggings',
+    nome: 'Conjunto Mari', tipo: 'Conjunto Golden Shape (Top + Short c/ bolsos)',
+    preco: 123.99, imagem: 'images/produtos/power-lift-conjunto-mari.jpg',
+    cores: [{ nome: 'Marrom P, M, G', cor: '#6b4a3a' }, { nome: 'Azul Marinho P, M, G', cor: '#012f7b' }, { nome: 'Cinza Aço P, M, G', cor: '#8a8587' }],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 ];
