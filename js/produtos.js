@@ -96,4 +96,11 @@ window.CHERRY_PRODUTOS = [
     preco: 123.99, imagem: 'images/produtos/power-lift-conjunto-mari.jpg',
     cores: [{ nome: 'Marrom P, M, G', cor: '#6b4a3a' }, { nome: 'Azul Marinho P, M, G', cor: '#012f7b' }, { nome: 'Cinza Aço P, M, G', cor: '#8a8587' }],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
+
+  { id: 'power-lift-jaqueta-thais', marca: 'power-lift', categoria: 'jaquetas',
+    nome: 'Jaqueta Thaís', tipo: 'Jaqueta Fitness Feminina com Zíper para Academia Inverno',
+    preco: 110, imagem: 'images/produtos/power-lift-jaqueta-thais.jpg',
+    cores: [{ nome: 'Branco P, M, G', cor: '#ffffff', imagem: 'images/produtos/power-lift-jaqueta-thais.jpg' }, { nome: 'Capuccino P, G', cor: '#6b4a3a', imagem: 'images/produtos/power-lift-jaqueta-thais-mwteyby01.jpg' }, { nome: 'Preto P', cor: '#1a1416' }],
+    galeria: ['images/produtos/power-lift-jaqueta-thais-mwteyby01.jpg', 'images/produtos/power-lift-jaqueta-thais-mwteyby02.jpg', 'images/produtos/power-lift-jaqueta-thais-mwteyby03.jpg'],
+    arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 ];
