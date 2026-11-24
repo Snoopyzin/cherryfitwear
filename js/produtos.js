@@ -100,14 +100,14 @@ window.CHERRY_PRODUTOS = [
   { id: 'power-lift-jaqueta-thais', marca: 'power-lift', categoria: 'jaquetas',
     nome: 'Jaqueta Thaís', tipo: 'Jaqueta Fitness Feminina com Zíper para Academia Inverno',
     preco: 110, imagem: 'images/produtos/power-lift-jaqueta-thais.jpg',
-    cores: [{ nome: 'Branco P, M, G', cor: '#ffffff', imagem: 'images/produtos/power-lift-jaqueta-thais.jpg' }, { nome: 'Capuccino P, G', cor: '#6b4a3a', imagem: 'images/produtos/power-lift-jaqueta-thais-mwteyby01.jpg' }, { nome: 'Preto P', cor: '#1a1416' }],
+    cores: [{ nome: 'Branco', cor: '#ffffff', imagem: 'images/produtos/power-lift-jaqueta-thais.jpg', tamanhos: ['P', 'M', 'G'] }, { nome: 'Capuccino', cor: '#6b4a3a', imagem: 'images/produtos/power-lift-jaqueta-thais-mwteyby01.jpg', tamanhos: ['P', 'G'] }, { nome: 'Preto', cor: '#1a1416', tamanhos: ['P'] }],
     galeria: ['images/produtos/power-lift-jaqueta-thais-mwteyby01.jpg', 'images/produtos/power-lift-jaqueta-thais-mwteyby02.jpg', 'images/produtos/power-lift-jaqueta-thais-mwteyby03.jpg'],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 
   { id: 'power-lift-bojo-cortinao-espuma-8mm-caixa-c-10-pares', marca: 'power-lift', categoria: 'acessorios',
     nome: 'Bojo Cortinão Espuma 8mm caixa c/10 pares', tipo: '',
     preco: 40, imagem: 'images/produtos/power-lift-bojo-cortinao-espuma-8mm-caixa-c-10-pares.jpg',
-    cores: [{ nome: 'Branco P, M, G', cor: '#ffffff' }],
+    cores: [{ nome: 'Branco', cor: '#ffffff' }],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 
   { id: 'power-lift-faixa-de-cabelo-em-malha-canelada', marca: 'power-lift', categoria: 'acessorios',
@@ -125,14 +125,14 @@ window.CHERRY_PRODUTOS = [
   { id: 'power-lift-conjunto-gorete', marca: 'power-lift', categoria: 'moda-evangelica',
     nome: 'Conjunto Gorete', tipo: 'Conjunto Harmonia Fitness Evangélico',
     preco: 139.5, imagem: 'images/produtos/power-lift-conjunto-gorete.jpg',
-    cores: [{ nome: 'Rosa Bebê', cor: '#f6b3c4', imagem: 'images/produtos/power-lift-conjunto-gorete.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Azul Frozen', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh1.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Marrom', cor: '#6b4a3a', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh3.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Roxo', cor: '#b69ad8', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh4.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Vermelho', cor: '#d62839', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh5.jpg', tamanhos: ['P', 'G', 'GG'] }],
+    cores: [{ nome: 'Rosa Bebê', cor: '#f6b3c4', imagem: 'images/produtos/power-lift-conjunto-gorete.jpg', tamanhos: ['M', 'G'] }, { nome: 'Azul Frozen', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh1.jpg', tamanhos: ['M', 'G'] }, { nome: 'Marrom', cor: '#6b4a3a', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh3.jpg', tamanhos: ['M', 'G'] }, { nome: 'Roxo', cor: '#b69ad8', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh4.jpg', tamanhos: ['M', 'G'] }, { nome: 'Vermelho', cor: '#d62839', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh5.jpg', tamanhos: ['M', 'G'] }],
     galeria: ['images/produtos/power-lift-conjunto-gorete-mwu0ltbh1.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh2.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh3.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh4.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh5.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh6.jpg'],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 
   { id: 'power-lift-conjunto-ruthe', marca: 'power-lift', categoria: 'moda-evangelica',
     nome: 'Conjunto Ruthe', tipo: 'Conjunto Dinâmico Fitness Evangélico',
     preco: 149.9, imagem: 'images/produtos/power-lift-conjunto-ruthe.jpg',
-    cores: [{ nome: 'Marte', cor: '#d62839', imagem: 'images/produtos/power-lift-conjunto-ruthe.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Mel', cor: '#cccccc', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv01.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Preto', cor: '#1a1416', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv02.jpg', tamanhos: ['P', 'GG'] }, { nome: 'Azul Frozen', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv03.jpg', tamanhos: ['P', 'GG'] }],
+    cores: [{ nome: 'Marte', cor: '#d62839', imagem: 'images/produtos/power-lift-conjunto-ruthe.jpg', tamanhos: ['M', 'G'] }, { nome: 'Mel', cor: '#cccccc', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv01.jpg', tamanhos: ['M', 'G'] }, { nome: 'Preto', cor: '#1a1416', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv02.jpg', tamanhos: ['M', 'G'] }, { nome: 'Azul Frozen', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv03.jpg', tamanhos: ['M', 'G'] }],
     galeria: ['images/produtos/power-lift-conjunto-ruthe-mwu0wzv01.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv02.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv03.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv04.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv05.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv06.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv07.jpg'],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 
@@ -153,7 +153,7 @@ window.CHERRY_PRODUTOS = [
   { id: 'power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l', marca: 'power-lift', categoria: 'masculino',
     nome: 'Camiseta Masculina Raglan Proteção Solar UV50+ Manga Longa PRETO', tipo: '',
     preco: 104, imagem: 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l.jpg',
-    cores: [{ nome: 'Preto', cor: '#1a1416', tamanhos: ['P', 'GG'] }, { nome: 'Vinho', cor: '#7a0a2a', tamanhos: ['P', 'GG'] }, { nome: 'Cinza Aço', cor: '#8a8587', tamanhos: ['P', 'GG'] }, { nome: 'Marrom', cor: '#6b4a3a', tamanhos: ['P', 'GG'] }],
+    cores: [{ nome: 'Preto', cor: '#1a1416', tamanhos: ['M', 'G'] }, { nome: 'Vinho', cor: '#7a0a2a', tamanhos: ['M', 'G'] }, { nome: 'Cinza Aço', cor: '#8a8587', tamanhos: ['M', 'G'] }, { nome: 'Marrom', cor: '#6b4a3a', tamanhos: ['M', 'G'] }],
     galeria: ['images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu189xq1.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu189xq2.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu1bmqd3.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu1bmqd4.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu1bmqd5.jpg'],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 ];
