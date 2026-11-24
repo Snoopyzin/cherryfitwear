@@ -153,7 +153,7 @@ window.CHERRY_PRODUTOS = [
   { id: 'power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l', marca: 'power-lift', categoria: 'masculino',
     nome: 'Camiseta Masculina Raglan Proteção Solar UV50+ Manga Longa PRETO', tipo: '',
     preco: 104, imagem: 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l.jpg',
-    cores: [{ nome: 'Preto', cor: '#1a1416', tamanhos: ['M', 'G'] }, { nome: 'Vinho', cor: '#7a0a2a', tamanhos: ['M', 'G'] }, { nome: 'Cinza Aço', cor: '#8a8587', tamanhos: ['M', 'G'] }, { nome: 'Marrom', cor: '#6b4a3a', tamanhos: ['M', 'G'] }],
+    cores: [{ nome: 'Preto', cor: '#1a1416', tamanhos: ['P', 'GG'] }, { nome: 'Vinho', cor: '#7a0a2a', tamanhos: ['P', 'GG'] }, { nome: 'Cinza Aço', cor: '#8a8587', tamanhos: ['P', 'GG'] }, { nome: 'Marrom', cor: '#6b4a3a', tamanhos: ['M', 'G'] }],
     galeria: ['images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu189xq1.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu189xq2.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu1bmqd3.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu1bmqd4.jpg', 'images/produtos/power-lift-camiseta-masculina-raglan-protecao-solar-uv50-manga-l-mwu1bmqd5.jpg'],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 ];
