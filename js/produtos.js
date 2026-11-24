@@ -123,14 +123,14 @@ window.CHERRY_PRODUTOS = [
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 
   { id: 'power-lift-conjunto-gorete', marca: 'power-lift', categoria: 'moda-evangelica',
-    nome: 'Conjunto Gorete', tipo: 'Conjunto Harmonia Fitness Evangélico',
+    nome: 'Conjunto Kezianne', tipo: 'Conjunto Harmonia Fitness Evangélico',
     preco: 139.5, imagem: 'images/produtos/power-lift-conjunto-gorete.jpg',
     cores: [{ nome: 'Rosa Bebê', cor: '#f6b3c4', imagem: 'images/produtos/power-lift-conjunto-gorete.jpg', tamanhos: ['M', 'G'] }, { nome: 'Azul Frozen', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh1.jpg', tamanhos: ['M', 'G'] }, { nome: 'Marrom', cor: '#6b4a3a', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh3.jpg', tamanhos: ['M', 'G'] }, { nome: 'Roxo', cor: '#b69ad8', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh4.jpg', tamanhos: ['M', 'G'] }, { nome: 'Vermelho', cor: '#d62839', imagem: 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh5.jpg', tamanhos: ['M', 'G'] }],
     galeria: ['images/produtos/power-lift-conjunto-gorete-mwu0ltbh1.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh2.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh3.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh4.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh5.jpg', 'images/produtos/power-lift-conjunto-gorete-mwu0ltbh6.jpg'],
     arte: { forma: 'legging', corpo: '#1a1416', tampa: '#cf2a5c', texto: '#e0709a' } },
 
   { id: 'power-lift-conjunto-ruthe', marca: 'power-lift', categoria: 'moda-evangelica',
-    nome: 'Conjunto Ruthe', tipo: 'Conjunto Dinâmico Fitness Evangélico',
+    nome: 'Conjunto Gorete', tipo: 'Conjunto Dinâmico Fitness Evangélico',
     preco: 149.9, imagem: 'images/produtos/power-lift-conjunto-ruthe.jpg',
     cores: [{ nome: 'Marte', cor: '#d62839', imagem: 'images/produtos/power-lift-conjunto-ruthe.jpg', tamanhos: ['M', 'G'] }, { nome: 'Mel', cor: '#cccccc', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv01.jpg', tamanhos: ['M', 'G'] }, { nome: 'Preto', cor: '#1a1416', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv02.jpg', tamanhos: ['M', 'G'] }, { nome: 'Azul Frozen', cor: '#3b6fb6', imagem: 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv03.jpg', tamanhos: ['M', 'G'] }],
     galeria: ['images/produtos/power-lift-conjunto-ruthe-mwu0wzv01.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv02.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv03.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv04.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv05.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv06.jpg', 'images/produtos/power-lift-conjunto-ruthe-mwu0wzv07.jpg'],
